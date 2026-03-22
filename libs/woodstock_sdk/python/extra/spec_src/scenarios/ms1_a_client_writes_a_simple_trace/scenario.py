@@ -39,6 +39,13 @@ markdown_node.markdown = """
 A client (e.g. calcium, calcite) uses the woodstock_sdk to write a trace record.
 For a simple trace — one with no large payload blobs — a single PUT to S3 is all that is needed.
 
+Traces correspond to events. A `trace_key` identifies a specific event within the trace tree,
+structured as a path: `{job-id}/{node}/{event}`. For example, `job-123/calc-456` is the
+trace node for a calculation, and `job-123/calc-456/calculation_started`,
+`job-123/calc-456/calculation_running`, and `job-123/calc-456/calculation_failed` are
+individual event traces within that node. Each event trace has its own payload describing
+what happened at that point.
+
 ### Steps
 
 #### It builds the trace record

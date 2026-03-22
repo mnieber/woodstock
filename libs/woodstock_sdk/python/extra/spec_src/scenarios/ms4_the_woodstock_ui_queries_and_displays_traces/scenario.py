@@ -10,14 +10,20 @@ scenario = sunya.add_scenario(
 
 def run_scenario():
     Query = c.WoodstockServer.Query
+    Manage = c.WoodstockServer.Manage
+    Traces = c.WoodstockSdk.Traces
     External = c.External
 
     r.user = External.Actors.User
     r.woodstock_ui = External.Actors.WoodstockUi
+    r.django_admin = External.Actors.DjangoAdmin
     r.query_traces_action = Query.Actions.QueryTraces
     r.fetch_blob_action = Query.Actions.FetchBlob
     r.trace_list = Query.Models.TraceList
     r.blob_content = Query.Models.BlobContent
+    r.delete_old_traces_action = Manage.Actions.DeleteOldTraces
+    r.delete_traces_action = Traces.Actions.DeleteTraces
+    r.retention_period = Manage.Models.RetentionPeriod
 
     with goal().display_a(r.trace_list).with_the(r.blob_content).for_the(r.user):
         with the(r.user).opens_the(r.woodstock_ui).and_applies_a(r.filter):
@@ -37,6 +43,17 @@ def run_scenario():
                 it().returns_the(r.blob_content)
             it().renders_the(r.blob_content).in_the(r.documents_section)
 
+    with goal().delete_traces_older_than_the(r.retention_period):
+        with the(r.django_admin).selects_the(r.retention_period).and_triggers_the(
+            r.delete_old_traces_action
+        ):
+            it().calls_the(r.delete_traces_action).with_the(r.retention_period)
+
+        with the(r.delete_traces_action).deletes_traces_older_than_the(r.retention_period):
+            it().removes_the(r.trace_log_entries).from_the(r.s3_trace_log)
+            it().removes_the(r.trace_records).from_the(r.s3_tree)
+            it().removes_the(r.index_rows).from_the(r.duckdb_index)
+
 
 markdown_node = sunya.add_markdown_node(
     scenario, "The woodstock UI queries and displays traces"
@@ -46,6 +63,11 @@ The woodstock UI lets a user browse and filter the trace tree. It queries the wo
 which answers from its DuckDB index. When rendering a trace, all `tree://` payload references
 are fetched immediately so the user sees the full trace — including any Markdown documents or
 JSON blobs — without having to click through.
+
+An administrator can also use the django-admin to delete traces older than a chosen retention
+period (one week, two weeks, or one month). The woodstock-server delegates the actual deletion
+to `DeleteTraces` in the woodstock_sdk, which removes the matching entries from the S3 trace
+log, the S3 tree, and the DuckDB index.
 
 ### Steps
 
@@ -73,6 +95,15 @@ which retrieves the raw content from the S3 tree and returns it as `BlobContent`
 The blob is rendered immediately in the documents section — no additional user interaction
 is required.</br>
 
+#### It deletes old traces via the django-admin
+
+An administrator opens the django-admin and selects a `RetentionPeriod` (one week, two weeks,
+or one month), then triggers the `DeleteOldTraces` action on the woodstock-server.</br>
+`DeleteOldTraces` calls `DeleteTraces` in the woodstock_sdk, passing the chosen retention period.</br>
+`DeleteTraces` removes all trace log entries older than the cutoff from the S3 trace log,
+deletes the corresponding objects from the S3 tree, and purges the matching rows from the
+DuckDB index.</br>
+
 ### Diagram
 
 ```mermaid
@@ -83,6 +114,9 @@ sequenceDiagram
     participant DuckDB
     participant FetchBlob as FetchBlob (action)
     participant S3
+    participant Admin as DjangoAdmin
+    participant DeleteOldTraces as DeleteOldTraces (action)
+    participant DeleteTraces as DeleteTraces (sdk action)
 
     User->>UI: open / apply filter
     UI->>QueryTraces: query_traces(filter)
@@ -99,6 +133,12 @@ sequenceDiagram
 
     UI->>UI: render trace tree (values, links, refs, blobs)
     UI-->>User: trace tree view
+
+    Admin->>DeleteOldTraces: delete_old_traces(retention_period)
+    DeleteOldTraces->>DeleteTraces: delete_traces(retention_period)
+    DeleteTraces->>S3: DELETE traces older than cutoff
+    DeleteTraces->>S3: DELETE tree objects for deleted traces
+    DeleteTraces->>DuckDB: DELETE rows older than cutoff
 ```
 
 ### Legend
@@ -107,4 +147,7 @@ sequenceDiagram
 |---|---|
 | QueryTraces | `c.WoodstockServer.Query.Actions.QueryTraces` |
 | FetchBlob | `c.WoodstockServer.Query.Actions.FetchBlob` |
+| DeleteOldTraces | `c.WoodstockServer.Manage.Actions.DeleteOldTraces` |
+| DeleteTraces | `c.WoodstockSdk.Traces.Actions.DeleteTraces` |
+| RetentionPeriod | `c.WoodstockServer.Manage.Models.RetentionPeriod` |
 """
