@@ -15,9 +15,9 @@ def run_scenario():
     r.client = External.Actors.Client
     r.write_trace_action = Trace.Actions.WriteTrace
     r.trace_record = Trace.Models.TraceRecord
-    r.whats_new_entry = Trace.Models.WhatsNewEntry
+    r.trace_log_entry = Trace.Models.TraceLogEntry
 
-    with goal().write_a(r.trace_record).to_the(r.whats_new_log):
+    with goal().write_a(r.trace_record).to_the(r.trace_log):
         with the(r.client).calls_the(r.write_trace_action).with_the(
             r.trace_key
         ).and_the(r.trace_state).and_the(r.payload):
@@ -27,8 +27,8 @@ def run_scenario():
                 r.writer
             )
             it().writes_the(r.trace_record).to_the(
-                r.whats_new_log
-            ).as_a(r.whats_new_entry).using_a(r.uuidv7_key)
+                r.trace_log
+            ).as_a(r.trace_log_entry).using_a(r.uuidv7_key)
             it().returns_the(r.trace_record)
 
 
@@ -48,10 +48,10 @@ and `payload` dict, adding a UTC `timestamp` and the configured `writer` name.</
 The `payload` uses the woodstock DSL: values are prefixed with `value://`, `link://`, `ref://`,
 or `tree://` to describe how the UI should render each field.</br>
 
-#### It writes the trace record to the whats-new log
+#### It writes the trace record to the trace log
 
 The action generates a UUID v7 key (lexicographically time-ordered) and writes the
-`TraceRecord` as a JSON file to `whats-new/{uuidv7}.json` on S3.</br>
+`TraceRecord` as a JSON file to `traces/{uuidv7}.json` on S3.</br>
 Because S3 list operations are lexicographically ordered, the woodstock-server can later
 use `StartAfter` on the last-seen key to find only new entries — no coordination needed.</br>
 
@@ -65,7 +65,13 @@ sequenceDiagram
 
     Client->>WriteTrace: write_trace(trace_key, trace_state, payload)
     WriteTrace->>WriteTrace: build TraceRecord (+ timestamp, writer)
-    WriteTrace->>S3: PUT whats-new/{uuidv7}.json
+    WriteTrace->>S3: PUT traces/{uuidv7}.json
     WriteTrace-->>Client: TraceRecord
 ```
+
+### Legend
+
+| Participant | Module path |
+|---|---|
+| WriteTrace | `c.WoodstockSdk.Trace.Actions.WriteTrace` |
 """

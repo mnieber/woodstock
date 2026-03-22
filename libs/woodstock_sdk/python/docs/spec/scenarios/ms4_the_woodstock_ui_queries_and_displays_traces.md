@@ -5,7 +5,9 @@
 ## The woodstock UI queries and displays traces
 
 The woodstock UI lets a user browse and filter the trace tree. It queries the woodstock-server,
-which answers purely from its DuckDB index — no S3 access is needed at this stage.
+which answers from its DuckDB index. When rendering a trace, all `tree://` payload references
+are fetched immediately so the user sees the full trace — including any Markdown documents or
+JSON blobs — without having to click through.
 
 ### Steps
 
@@ -18,16 +20,20 @@ The UI sends the filter to the `QueryTraces` action on the woodstock-server.</br
 #### It queries the DuckDB index
 
 `QueryTraces` translates the filter into a DuckDB query and returns a `TraceList`.</br>
-The response includes `trace_key`, `trace_state`, `writer`, `timestamp`, and the inline
-payload for each matching trace — everything needed to render the tree view.</br>
+The response includes `trace_key`, `trace_state`, `writer`, `timestamp`, and the full payload
+for each matching trace.</br>
 Because the index is local to the server, this query is fast even over large trace histories.</br>
 
-#### It renders the trace tree
+#### It renders the trace tree and fetches all blobs
 
 The UI groups results by `trace_key` prefix to show the hierarchical tree.</br>
-Each node displays its `trace_state` as a badge and its payload fields grouped by DSL prefix
-(`value://` as a key-value table, `link://` as clickable links, `ref://` as navigable
-cross-references within the UI, `tree://` as on-demand document links).</br>
+Each node's payload fields are rendered according to their DSL prefix:
+`value://` as a key-value table, `link://` as clickable external links, and `ref://` as
+navigable cross-references within the woodstock UI.</br>
+For every `tree://` reference in the payload, the UI calls `FetchBlob` on the woodstock-server,
+which retrieves the raw content from the S3 tree and returns it as `BlobContent`.</br>
+The blob is rendered immediately in the documents section — no additional user interaction
+is required.</br>
 
 ### Diagram
 
@@ -37,13 +43,30 @@ sequenceDiagram
     participant UI as WoodstockUi
     participant QueryTraces as QueryTraces (action)
     participant DuckDB
+    participant FetchBlob as FetchBlob (action)
+    participant S3
 
     User->>UI: open / apply filter
     UI->>QueryTraces: query_traces(filter)
     QueryTraces->>DuckDB: SELECT ... WHERE ...
     DuckDB-->>QueryTraces: rows
     QueryTraces-->>UI: TraceList
-    UI->>UI: render trace tree
+
+    loop for each tree:// reference in TraceList
+        UI->>FetchBlob: fetch_blob(tree_path)
+        FetchBlob->>S3: GET tree/{tree_path}
+        S3-->>FetchBlob: raw content
+        FetchBlob-->>UI: BlobContent
+    end
+
+    UI->>UI: render trace tree (values, links, refs, blobs)
     UI-->>User: trace tree view
 ```
+
+### Legend
+
+| Participant | Module path |
+|---|---|
+| QueryTraces | `c.WoodstockServer.Query.Actions.QueryTraces` |
+| FetchBlob | `c.WoodstockServer.Query.Actions.FetchBlob` |
 

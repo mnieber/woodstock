@@ -18,7 +18,7 @@ def run_scenario():
     r.trace_record = Trace.Models.TraceRecord
     r.blob = Trace.Models.Blob
 
-    with goal().write_a(r.trace_record).with_a(r.blob).to_the(r.whats_new_log):
+    with goal().write_a(r.trace_record).with_a(r.blob).to_the(r.trace_log):
         with the(r.client).calls_the(r.write_trace_action).with_the(
             r.trace_key
         ).and_the(r.trace_state).and_the(r.payload).and_the(r.blobs):
@@ -28,11 +28,11 @@ def run_scenario():
                 it().uploads_the(r.blob).to_the(
                     r.tree_path
                 ).under_the(r.trace_key)
-                it().replaces_the(r.payload_value).with_a(
-                    r.tree_ref
-                ).of_the_form("tree://{tree_path}")
+                it().inserts_a(r.tree_ref).of_the_form(
+                    "tree://{tree_path}"
+                ).into_the(r.payload)
             it().writes_the(r.trace_record).to_the(
-                r.whats_new_log
+                r.trace_log
             ).using_a(r.uuidv7_key)
             it().returns_the(r.trace_record)
 
@@ -42,25 +42,29 @@ markdown_node = sunya.add_markdown_node(
 )
 markdown_node.markdown = """
 When a trace payload contains large or rich content (e.g. a Markdown error report), the client
-passes blobs alongside the trace. The SDK uploads each blob to the S3 tree first, then writes a
-lightweight trace record that references the blob via a `tree://` DSL value.
+passes blobs alongside the trace. The SDK uploads each blob to the S3 tree first, then inserts
+a `tree://` reference into the payload alongside any other DSL-prefixed values already there
+(e.g. `value://`, `link://`, `ref://`). The resulting trace record written to the trace log is
+lightweight, while the rich content lives in the tree.
 
 ### Steps
 
 #### It uploads each blob to the S3 tree
 
 For every `Blob` supplied by the client, `UploadBlob` writes the blob's content to
-`tree/{trace_key}/{blob_name}` on S3.</br>
-The corresponding payload field in the trace record is updated to a `tree://` reference,
-e.g. `"error.md": "tree://job-123/calc-456/error.md"`.</br>
-This keeps the whats-new entry small while the rich content lives in the tree.</br>
+`tree/{trace_key}/{blob_name}` on S3 and returns the tree path.</br>
+A `tree://` reference for that path is then inserted into the payload dict as an additional
+key alongside whatever `value://`, `link://`, or `ref://` keys the client already provided.</br>
+For example, a payload might contain `"severity": "value://high"`,
+`"calculation_page": "link://https://calcite/jobs/123/calculations/abc"`, and
+`"full_error": "tree://job-123/calc-456/error.md"` all at once.</br>
 
-#### It writes the trace record to the whats-new log
+#### It writes the trace record to the trace log
 
-With all blob references resolved, `WriteTrace` writes the `TraceRecord` to
-`whats-new/{uuidv7}.json` — identical to the simple trace case.</br>
+With all blob references inserted, `WriteTrace` writes the `TraceRecord` to
+`traces/{uuidv7}.json` — identical to the simple trace case.</br>
 The woodstock-server never needs to crawl the tree to build its index;
-it only fetches tree paths when a user requests to view a specific payload.</br>
+it only fetches tree paths when rendering a trace for the user.</br>
 
 ### Diagram
 
@@ -77,10 +81,17 @@ sequenceDiagram
         WriteTrace->>UploadBlob: upload_blob(trace_key, blob)
         UploadBlob->>S3: PUT tree/{trace_key}/{blob_name}
         UploadBlob-->>WriteTrace: tree_path
-        WriteTrace->>WriteTrace: replace payload value with tree://{tree_path}
+        WriteTrace->>WriteTrace: insert tree://{tree_path} into payload
     end
 
-    WriteTrace->>S3: PUT whats-new/{uuidv7}.json
+    WriteTrace->>S3: PUT traces/{uuidv7}.json
     WriteTrace-->>Client: TraceRecord
 ```
+
+### Legend
+
+| Participant | Module path |
+|---|---|
+| WriteTrace | `c.WoodstockSdk.Trace.Actions.WriteTrace` |
+| UploadBlob | `c.WoodstockSdk.Trace.Actions.UploadBlob` |
 """
