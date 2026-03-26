@@ -3,15 +3,14 @@ from sunya import C as c
 from sunya import R as r
 from sunya import goal, it, the
 
-scenario = sunya.add_scenario(
-    "ms4_the_woodstock_ui_queries_and_displays_traces"
-)
+scenario = sunya.add_scenario("ms5_the_woodstock_ui_queries_and_displays_traces")
 
 
 def run_scenario():
     Query = c.WoodstockServer.Query
     Manage = c.WoodstockServer.Manage
     Traces = c.WoodstockSdk.Traces
+    Storage = c.WoodstockSdk.Storage
     External = c.External
 
     r.user = External.Actors.User
@@ -24,6 +23,7 @@ def run_scenario():
     r.delete_old_traces_action = Manage.Actions.DeleteOldTraces
     r.delete_traces_action = Traces.Actions.DeleteTraces
     r.retention_period = Manage.Models.RetentionPeriod
+    r.file_storage = Storage.Models.FileStorage
 
     with goal().display_a(r.trace_list).with_the(r.blob_content).for_the(r.user):
         with the(r.user).opens_the(r.woodstock_ui).and_applies_a(r.filter):
@@ -36,10 +36,12 @@ def run_scenario():
             it().returns_the(r.trace_list)
 
         with the(r.woodstock_ui).renders_the(r.trace_list).as_a(r.trace_tree):
-            with it().calls_the(r.fetch_blob_action).for_each(
-                r.tree_ref
-            ).in_the(r.trace_list):
-                it().fetches_the(r.blob_content).from_the(r.s3_tree).at_the(r.tree_path)
+            with it().calls_the(r.fetch_blob_action).for_each(r.tree_ref).in_the(
+                r.trace_list
+            ):
+                it().calls_the(r.file_storage).get_file(r.tree_path).to_get_the(
+                    r.blob_content
+                )
                 it().returns_the(r.blob_content)
             it().renders_the(r.blob_content).in_the(r.documents_section)
 
@@ -49,9 +51,11 @@ def run_scenario():
         ):
             it().calls_the(r.delete_traces_action).with_the(r.retention_period)
 
-        with the(r.delete_traces_action).deletes_traces_older_than_the(r.retention_period):
-            it().removes_the(r.trace_log_entries).from_the(r.s3_trace_log)
-            it().removes_the(r.trace_records).from_the(r.s3_tree)
+        with the(r.delete_traces_action).deletes_traces_older_than_the(
+            r.retention_period
+        ):
+            it().calls_the(r.file_storage).delete_files(r.trace_log_entries)
+            it().calls_the(r.file_storage).delete_files(r.trace_records)
             it().removes_the(r.index_rows).from_the(r.duckdb_index)
 
 
@@ -91,7 +95,7 @@ Each node's payload fields are rendered according to their DSL prefix:
 `value://` as a key-value table, `link://` as clickable external links, and `ref://` as
 navigable cross-references within the woodstock UI.</br>
 For every `tree://` reference in the payload, the UI calls `FetchBlob` on the woodstock-server,
-which retrieves the raw content from the S3 tree and returns it as `BlobContent`.</br>
+which calls `FileStorage.get_file(tree_path)` and returns the content as `BlobContent`.</br>
 The blob is rendered immediately in the documents section — no additional user interaction
 is required.</br>
 
@@ -100,9 +104,8 @@ is required.</br>
 An administrator opens the django-admin and selects a `RetentionPeriod` (one week, two weeks,
 or one month), then triggers the `DeleteOldTraces` action on the woodstock-server.</br>
 `DeleteOldTraces` calls `DeleteTraces` in the woodstock_sdk, passing the chosen retention period.</br>
-`DeleteTraces` removes all trace log entries older than the cutoff from the S3 trace log,
-deletes the corresponding objects from the S3 tree, and purges the matching rows from the
-DuckDB index.</br>
+`DeleteTraces` calls `FileStorage.delete_files` for the matching trace log entries, then again
+for the corresponding tree objects, and finally purges the matching rows from the DuckDB index.</br>
 
 ### Diagram
 
@@ -113,7 +116,7 @@ sequenceDiagram
     participant QueryTraces as QueryTraces (action)
     participant DuckDB
     participant FetchBlob as FetchBlob (action)
-    participant S3
+    participant FileStorage
     participant Admin as DjangoAdmin
     participant DeleteOldTraces as DeleteOldTraces (action)
     participant DeleteTraces as DeleteTraces (sdk action)
@@ -126,8 +129,8 @@ sequenceDiagram
 
     loop for each tree:// reference in TraceList
         UI->>FetchBlob: fetch_blob(tree_path)
-        FetchBlob->>S3: GET tree/{tree_path}
-        S3-->>FetchBlob: raw content
+        FetchBlob->>FileStorage: get_file("tree/{tree_path}")
+        FileStorage-->>FetchBlob: raw content
         FetchBlob-->>UI: BlobContent
     end
 
@@ -136,8 +139,8 @@ sequenceDiagram
 
     Admin->>DeleteOldTraces: delete_old_traces(retention_period)
     DeleteOldTraces->>DeleteTraces: delete_traces(retention_period)
-    DeleteTraces->>S3: DELETE traces older than cutoff
-    DeleteTraces->>S3: DELETE tree objects for deleted traces
+    DeleteTraces->>FileStorage: delete_files(trace log entries older than cutoff)
+    DeleteTraces->>FileStorage: delete_files(tree objects for deleted traces)
     DeleteTraces->>DuckDB: DELETE rows older than cutoff
 ```
 
@@ -150,4 +153,5 @@ sequenceDiagram
 | DeleteOldTraces | `c.WoodstockServer.Manage.Actions.DeleteOldTraces` |
 | DeleteTraces | `c.WoodstockSdk.Traces.Actions.DeleteTraces` |
 | RetentionPeriod | `c.WoodstockServer.Manage.Models.RetentionPeriod` |
+| FileStorage | `c.WoodstockSdk.Storage.Models.FileStorage` |
 """
