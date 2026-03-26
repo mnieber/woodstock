@@ -73,22 +73,22 @@ period (one week, two weeks, or one month). The woodstock-server delegates the a
 to `DeleteTraces` in the woodstock_sdk, which removes the matching entries from the S3 trace
 log, the S3 tree, and the DuckDB index.
 
-### Steps
+## Steps
 
-#### It sends a filter query to the server
+### It sends a filter query to the server
 
 The user opens the woodstock UI and optionally sets filters (trace key prefix, trace state,
 writer, time range).</br>
 The UI sends the filter to the `QueryTraces` action on the woodstock-server.</br>
 
-#### It queries the DuckDB index
+### It queries the DuckDB index
 
 `QueryTraces` translates the filter into a DuckDB query and returns a `TraceList`.</br>
 The response includes `trace_key`, `trace_state`, `writer`, `timestamp`, and the full payload
 for each matching trace.</br>
 Because the index is local to the server, this query is fast even over large trace histories.</br>
 
-#### It renders the trace tree and fetches all blobs
+### It renders the trace tree and fetches all blobs
 
 The UI groups results by `trace_key` prefix to show the hierarchical tree.</br>
 Each node's payload fields are rendered according to their DSL prefix:
@@ -99,7 +99,7 @@ which calls `FileStorage.get_file(tree_path)` and returns the content as `BlobCo
 The blob is rendered immediately in the documents section — no additional user interaction
 is required.</br>
 
-#### It deletes old traces via the django-admin
+### It deletes old traces via the django-admin
 
 An administrator opens the django-admin and selects a `RetentionPeriod` (one week, two weeks,
 or one month), then triggers the `DeleteOldTraces` action on the woodstock-server.</br>
@@ -107,7 +107,7 @@ or one month), then triggers the `DeleteOldTraces` action on the woodstock-serve
 `DeleteTraces` calls `FileStorage.delete_files` for the matching trace log entries, then again
 for the corresponding tree objects, and finally purges the matching rows from the DuckDB index.</br>
 
-### Diagram
+## Diagram
 
 ```mermaid
 sequenceDiagram

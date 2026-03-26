@@ -9,9 +9,9 @@ trace log. A scheduler triggers a poll at a regular interval; the server fetches
 entries it has not yet seen and upserts them into the index. All file I/O goes through
 `FileStorage`, so the server works identically against S3 or a local directory.
 
-### Steps
+## Steps
 
-#### It finds new trace log entries
+### It finds new trace log entries
 
 `PollTraceLog` reads the `last_seen_key` from `IndexState` — the UUID v7 key of the last
 trace log entry it processed.</br>
@@ -22,7 +22,7 @@ coordination or locking is needed.</br>
 For `S3FileStorage` this maps to `list_objects` with `StartAfter`; for `LocalFsFileStorage`
 it maps to a sorted `os.scandir` with the same cursor logic.</br>
 
-#### It upserts each new trace into the DuckDB index
+### It upserts each new trace into the DuckDB index
 
 For each new entry, the server calls `FileStorage.get_file(path)` to read the `TraceRecord`
 JSON, then calls `UpsertTrace` to insert or update the row in DuckDB (keyed on
@@ -31,7 +31,7 @@ After processing each entry, it advances the `last_seen_key` in `IndexState`.</b
 The DuckDB index is now queryable for filtering by `trace_key`, `trace_state`, `writer`,
 and `timestamp` — without touching the tree.</br>
 
-### Diagram
+## Diagram
 
 ```mermaid
 sequenceDiagram

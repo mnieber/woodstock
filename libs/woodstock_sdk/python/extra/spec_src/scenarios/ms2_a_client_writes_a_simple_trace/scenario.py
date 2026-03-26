@@ -74,6 +74,7 @@ sequenceDiagram
 
     Client->>WriteTrace: write_trace(trace_key, trace_state, payload)
     WriteTrace->>WriteTrace: build TraceRecord (+ timestamp, writer)
+    Note right of WriteTrace: Add trace to trace_log
     WriteTrace->>FileStorage: put_file("traces/{uuidv7}.json", trace_record)
     WriteTrace-->>Client: TraceRecord
 ```

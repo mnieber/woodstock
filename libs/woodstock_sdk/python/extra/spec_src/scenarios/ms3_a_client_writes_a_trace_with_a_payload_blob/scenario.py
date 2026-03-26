@@ -45,9 +45,9 @@ then inserts a `tree://` reference into the payload alongside any other DSL-pref
 already there (e.g. `value://`, `link://`, `ref://`). The resulting trace record written to
 the trace log is lightweight, while the rich content lives in the tree.
 
-### Steps
+## Steps
 
-#### It uploads each blob to the tree
+### It uploads each blob to the tree
 
 For every `Blob` supplied by the client, `UploadBlob` calls `FileStorage.put_file` to write
 the blob's content at `tree/{trace_key}/{blob_name}` and returns the tree path.</br>
@@ -57,14 +57,14 @@ For example, a payload might contain `"severity": "value://high"`,
 `"calculation_page": "link://https://calcite/jobs/123/calculations/abc"`, and
 `"full_error": "tree://job-123/calc-456/error.md"` all at once.</br>
 
-#### It writes the trace record to the trace log
+### It writes the trace record to the trace log
 
 With all blob references inserted, `WriteTrace` calls `FileStorage.put_file` to write the
 `TraceRecord` to `traces/{uuidv7}.json` — identical to the simple trace case.</br>
 The woodstock-server never needs to crawl the tree to build its index;
 it only fetches tree paths when rendering a trace for the user.</br>
 
-### Diagram
+## Diagram
 
 ```mermaid
 sequenceDiagram

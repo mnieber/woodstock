@@ -21,16 +21,16 @@ The `FileStorage` interface provides four operations:
 `S3FileStorage` maps these to boto3 calls against a configured bucket.
 `LocalFsFileStorage` maps them to plain filesystem operations under a configured base directory.
 
-### Steps
+## Steps
 
-#### It selects a storage backend from settings
+### It selects a storage backend from settings
 
 The operator configures either an S3 bucket name (for `S3FileStorage`) or a local base path
 (for `LocalFsFileStorage`) in the woodstock settings.</br>
 All SDK actions and woodstock-server actions receive the `FileStorage` instance — they never
 import boto3 or touch the filesystem directly.</br>
 
-### Diagram
+## Diagram
 
 ```mermaid
 classDiagram
