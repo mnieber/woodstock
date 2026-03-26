@@ -1,10 +1,13 @@
 import json
 import logging
+import typing as T
 from datetime import datetime, timezone
 
 from dataclassy import dataclass
 from woodstock_sdk.storage.models.file_storage import FileStorage
+from woodstock_sdk.trace.actions.upload_blob import upload_blob
 from woodstock_sdk.trace.enums import TraceState
+from woodstock_sdk.trace.models.blob import Blob
 from woodstock_sdk.trace.models.trace_record import TraceRecord
 from woodstock_sdk.trace.utils.uuid7 import uuid7
 
@@ -17,16 +20,23 @@ class WriteTraceForm:
     author: str
     trace_state: TraceState
     payload: dict
+    blobs: T.List[Blob] = []
 
 
 def write_trace(form: WriteTraceForm, file_storage: FileStorage) -> TraceRecord:
+    # Upload blobs and insert tree:// references into a copy of the payload
+    payload = dict(form.payload)
+    for blob in form.blobs:
+        tree_path = upload_blob(form.trace_key, blob, file_storage)
+        payload[blob.name] = f"tree://{tree_path}"
+
     # Build the trace record
     record = TraceRecord(
         trace_key=form.trace_key,
         trace_state=form.trace_state,
         author=form.author,
         timestamp=datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
-        payload=form.payload,
+        payload=payload,
     )
 
     # Write the record to the trace log
