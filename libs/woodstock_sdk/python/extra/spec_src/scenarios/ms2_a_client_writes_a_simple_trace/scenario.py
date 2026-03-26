@@ -14,7 +14,6 @@ def run_scenario():
     r.client = External.Actors.Client
     r.write_trace_action = Trace.Actions.WriteTrace
     r.trace_record = Trace.Models.TraceRecord
-    r.trace_log_entry = Trace.Models.TraceLogEntry
     r.file_storage = Storage.Models.FileStorage
 
     with goal().write_a(r.trace_record).to_the(r.trace_log):
@@ -24,7 +23,7 @@ def run_scenario():
             it().creates_the(r.trace_record).with_the(r.trace_key).and_the(
                 r.trace_state
             ).and_the(r.payload).and_a(r.timestamp).and_a(r.writer)
-            it().calls_the(r.file_storage).put_file(r.trace_log_entry).at_path(
+            it().calls_the(r.file_storage).put_file(r.trace_record).at_path(
                 "traces/{uuidv7}.json"
             )
             it().returns_the(r.trace_record)

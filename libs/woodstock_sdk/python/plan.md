@@ -25,7 +25,6 @@ Manual test: instantiate `LocalFsFileStorage`, call `put_file`, `get_file`, `lis
 Depends on: Phase 1
 
 - [ ] `Trace.Models.TraceRecord`
-- [ ] `Trace.Models.TraceLogEntry`
 - [ ] `Trace.Actions.WriteTrace` — builds record, writes to `traces/{uuidv7}.json` via `FileStorage`
 
 > See [ms2](extra/spec_src/scenarios/ms2_a_client_writes_a_simple_trace/scenario.py).
