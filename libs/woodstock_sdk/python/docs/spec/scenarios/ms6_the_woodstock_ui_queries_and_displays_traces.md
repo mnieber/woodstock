@@ -1,6 +1,6 @@
 [comment]: <> (This file is auto-generated. Do not edit directly.)
 
-# Scenario: ms5_the_woodstock_ui_queries_and_displays_traces
+# Scenario: ms6_the_woodstock_ui_queries_and_displays_traces
 
 ## The woodstock UI queries and displays traces
 

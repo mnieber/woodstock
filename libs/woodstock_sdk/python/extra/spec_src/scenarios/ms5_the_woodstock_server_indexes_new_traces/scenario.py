@@ -3,7 +3,7 @@ from sunya import C as c
 from sunya import R as r
 from sunya import goal, it, the
 
-scenario = sunya.add_scenario("ms4_the_woodstock_server_indexes_new_traces")
+scenario = sunya.add_scenario("ms5_the_woodstock_server_indexes_new_traces")
 
 
 def run_scenario():

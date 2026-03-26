@@ -1,6 +1,6 @@
 [comment]: <> (This file is auto-generated. Do not edit directly.)
 
-# Scenario: ms4_the_woodstock_server_indexes_new_traces
+# Scenario: ms5_the_woodstock_server_indexes_new_traces
 
 ## The woodstock-server indexes new traces
 

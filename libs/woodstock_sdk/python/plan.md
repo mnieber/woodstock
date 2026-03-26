@@ -45,9 +45,21 @@ Depends on: Phase 2
 
 ---
 
-### Phase 4 — Server indexes new traces (ms4)
+### Phase 4 — Label trace nodes (ms4)
 
 Depends on: Phase 2
+
+- [ ] `Trace.Models.LabelPatch` — dict mapping node keys to label name/value pairs
+- [ ] Extend `TraceRecord` with optional `labels` field
+- [ ] Extend `WriteTraceForm` to accept `label_patch`, pass through into `TraceRecord`
+
+> See [ms4](extra/spec_src/scenarios/ms4_a_client_labels_trace_nodes/scenario.py) for label structure, null-drop semantics, and replay model.
+
+---
+
+### Phase 5 — Server indexes new traces (ms5)
+
+Depends on: Phases 2 and 4
 
 - [ ] Maarten will create the basic django-admin file structure for woodstock_server
 - [ ] `WoodstockServer.Index.Models.IndexState` — persists `last_seen_key`
@@ -55,15 +67,15 @@ Depends on: Phase 2
 - [ ] `WoodstockServer.Index.Actions.UpsertTrace` — inserts/updates row in DuckDB
 - [ ] `WoodstockServer.Index.Actions.PollTraceLog` — reads `last_seen_key`, calls `list_files`, fetches + upserts each new entry, advances cursor
 
-> See [ms4](extra/spec_src/scenarios/ms4_the_woodstock_server_indexes_new_traces/scenario.py) for cursor logic and DuckDB schema notes.
+> See [ms5](extra/spec_src/scenarios/ms5_the_woodstock_server_indexes_new_traces/scenario.py) for cursor logic and DuckDB schema notes. `UpsertTrace` will need to apply label patches per `(node_key, label_name)` in UUID v7 order — see ms4 for replay semantics.
 
 Manual test: write a few traces via Phase 2, run `PollTraceLog`, verify DuckDB rows.
 
 ---
 
-### Phase 5 — UI queries and displays traces; retention (ms5)
+### Phase 6 — UI queries and displays traces; retention (ms5)
 
-Depends on: Phases 3 and 4
+Depends on: Phases 3, 4, and 5
 Scope: this phase covers the server side. The UI will be implemented in a separate phase later.
 
 - [ ] `WoodstockServer.Query.Actions.QueryTraces` — DuckDB query with filter (prefix, state, author, time range), returns `TraceList`
@@ -73,4 +85,4 @@ Scope: this phase covers the server side. The UI will be implemented in a separa
 - [ ] `WoodstockServer.Manage.Actions.DeleteOldTraces` — django-admin entry point, delegates to `DeleteTraces`
 - [ ] `WoodstockServer.Manage.Models.RetentionPeriod`
 
-> See [ms5](extra/spec_src/scenarios/ms5_the_woodstock_ui_queries_and_displays_traces/scenario.py).
+> See [ms5](extra/spec_src/scenarios/ms6_the_woodstock_ui_queries_and_displays_traces/scenario.py).
