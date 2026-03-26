@@ -1,0 +1,5 @@
+run-test test_name capture="no":
+    pytest tests -vv --capture={{ capture }} -k {{ test_name }}
+
+run-tests capture="fd":
+    pytest tests -vv --capture={{ capture }}
