@@ -21,6 +21,7 @@ class WriteTraceForm:
     trace_state: TraceState
     payload: dict
     blobs: T.List[Blob] = []
+    label_patch: T.Dict[str, T.Dict[str, T.Any]] = {}
 
 
 def write_trace(form: WriteTraceForm, file_storage: FileStorage) -> TraceRecord:
@@ -37,6 +38,7 @@ def write_trace(form: WriteTraceForm, file_storage: FileStorage) -> TraceRecord:
         author=form.author,
         timestamp=datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
         payload=payload,
+        labels=form.label_patch,
     )
 
     # Write the record to the trace log
@@ -49,6 +51,7 @@ def write_trace(form: WriteTraceForm, file_storage: FileStorage) -> TraceRecord:
             "author": record.author,
             "timestamp": record.timestamp,
             "payload": record.payload,
+            "labels": record.labels,
         }
     ).encode()
     logger.info("Writing trace record to %s", path)

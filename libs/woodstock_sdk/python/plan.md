@@ -49,7 +49,6 @@ Depends on: Phase 2
 
 Depends on: Phase 2
 
-- [ ] `Trace.Models.LabelPatch` — dict mapping node keys to label name/value pairs
 - [ ] Extend `TraceRecord` with optional `labels` field
 - [ ] Extend `WriteTraceForm` to accept `label_patch`, pass through into `TraceRecord`
 

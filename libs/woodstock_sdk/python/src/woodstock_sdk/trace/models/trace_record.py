@@ -12,3 +12,4 @@ class TraceRecord:
     author: str
     timestamp: str
     payload: T.Dict[str, str] = {}
+    labels: T.Dict[str, T.Dict[str, T.Any]] = {}

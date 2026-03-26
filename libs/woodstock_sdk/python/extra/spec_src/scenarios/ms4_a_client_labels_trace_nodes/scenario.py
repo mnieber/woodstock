@@ -14,7 +14,7 @@ def run_scenario():
     r.client = External.Actors.Client
     r.write_trace_action = Trace.Actions.WriteTrace
     r.trace_record = Trace.Models.TraceRecord
-    r.label_patch = Trace.Models.LabelPatch
+    r.label_patch = External.Actors.LabelPatch
     r.file_storage = Storage.Models.FileStorage
 
     with goal().apply_the(r.label_patch).to_trace_nodes_via_the(r.trace_record):
