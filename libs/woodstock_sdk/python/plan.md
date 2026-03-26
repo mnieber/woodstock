@@ -29,7 +29,7 @@ Depends on: Phase 1
 
 > See [ms2](extra/spec_src/scenarios/ms2_a_client_writes_a_simple_trace/scenario.py).
 
-Manual test: call `WriteTrace`, verify the JSON file appears under `traces/`.
+Write a once-off test: call `WriteTrace`, verify the JSON file appears under `traces/`. Run the once-off and fix bugs if needed.
 
 ---
 
@@ -66,7 +66,7 @@ Manual test: write a few traces via Phase 2, run `PollTraceLog`, verify DuckDB r
 Depends on: Phases 3 and 4
 Scope: this phase covers the server side. The UI will be implemented in a separate phase later.
 
-- [ ] `WoodstockServer.Query.Actions.QueryTraces` — DuckDB query with filter (prefix, state, writer, time range), returns `TraceList`
+- [ ] `WoodstockServer.Query.Actions.QueryTraces` — DuckDB query with filter (prefix, state, author, time range), returns `TraceList`
 - [ ] `WoodstockServer.Query.Models.TraceList`, `BlobContent`
 - [ ] `WoodstockServer.Query.Actions.FetchBlob` — calls `FileStorage.get_file`, returns `BlobContent`
 - [ ] `WoodstockSdk.Traces.Actions.DeleteTraces` — deletes trace log entries, tree objects, DuckDB rows for a retention cutoff

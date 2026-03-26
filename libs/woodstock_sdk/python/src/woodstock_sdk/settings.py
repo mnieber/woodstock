@@ -6,4 +6,4 @@ WOODSTOCK_S3_BUCKET: str = os.environ.get("WOODSTOCK_S3_BUCKET", "")
 WOODSTOCK_LOCAL_STORAGE_DIR: Path = Path(
     os.environ.get("WOODSTOCK_LOCAL_STORAGE_DIR", "/tmp/woodstock")
 )
-WOODSTOCK_AWS_REGION: str = os.environ.get("WOODSTOCK_AWS_REGION", "us-east-1")
+WOODSTOCK_AWS_REGION: str = os.environ.get("WOODSTOCK_AWS_REGION", "eu-central-1")

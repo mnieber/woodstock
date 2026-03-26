@@ -28,7 +28,7 @@ For each new entry, the server calls `FileStorage.get_file(path)` to read the `T
 JSON, then calls `UpsertTrace` to insert or update the row in DuckDB (keyed on
 `trace_key` + `uuidv7`).</br>
 After processing each entry, it advances the `last_seen_key` in `IndexState`.</br>
-The DuckDB index is now queryable for filtering by `trace_key`, `trace_state`, `writer`,
+The DuckDB index is now queryable for filtering by `trace_key`, `trace_state`, `author`,
 and `timestamp` — without touching the tree.</br>
 
 ## Diagram

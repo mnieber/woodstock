@@ -22,7 +22,7 @@ def run_scenario():
         ).and_the(r.trace_state).and_the(r.payload):
             it().creates_the(r.trace_record).with_the(r.trace_key).and_the(
                 r.trace_state
-            ).and_the(r.payload).and_a(r.timestamp).and_a(r.writer)
+            ).and_the(r.payload).and_a(r.timestamp).and_a(r.author)
             it().calls_the(r.file_storage).put_file(r.trace_record).at_path(
                 "traces/{uuidv7}.json"
             )
@@ -51,7 +51,7 @@ correspond to an actual event, but it can hold shared information for its child 
 ### It builds the trace record
 
 The `WriteTrace` action constructs a `TraceRecord` from the supplied `trace_key`, `trace_state`,
-and `payload` dict, adding a UTC `timestamp` and the configured `writer` name.</br>
+and `payload` dict, adding a UTC `timestamp` and the configured `author` name.</br>
 The `payload` uses the woodstock DSL: values are prefixed with `value://`, `link://`, `ref://`,
 or `tree://` to describe how the UI should render each field.</br>
 
@@ -72,7 +72,7 @@ sequenceDiagram
     participant FileStorage
 
     Client->>WriteTrace: write_trace(trace_key, trace_state, payload)
-    WriteTrace->>WriteTrace: build TraceRecord (+ timestamp, writer)
+    WriteTrace->>WriteTrace: build TraceRecord (+ timestamp, author)
     Note right of WriteTrace: Add trace to trace_log
     WriteTrace->>FileStorage: put_file("traces/{uuidv7}.json", trace_record)
     WriteTrace-->>Client: TraceRecord

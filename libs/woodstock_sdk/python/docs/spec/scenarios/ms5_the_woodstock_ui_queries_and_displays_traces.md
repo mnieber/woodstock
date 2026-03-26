@@ -19,13 +19,13 @@ log, the S3 tree, and the DuckDB index.
 ### It sends a filter query to the server
 
 The user opens the woodstock UI and optionally sets filters (trace key prefix, trace state,
-writer, time range).</br>
+author, time range).</br>
 The UI sends the filter to the `QueryTraces` action on the woodstock-server.</br>
 
 ### It queries the DuckDB index
 
 `QueryTraces` translates the filter into a DuckDB query and returns a `TraceList`.</br>
-The response includes `trace_key`, `trace_state`, `writer`, `timestamp`, and the full payload
+The response includes `trace_key`, `trace_state`, `author`, `timestamp`, and the full payload
 for each matching trace.</br>
 Because the index is local to the server, this query is fast even over large trace histories.</br>
 

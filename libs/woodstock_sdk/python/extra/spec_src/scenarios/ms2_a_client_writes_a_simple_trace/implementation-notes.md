@@ -36,7 +36,7 @@ A full trace record looks like this:
 {
   "trace_key": "job-123/calc-456/calculation_failed",
   "trace_state": "error",
-  "writer": "calcium",
+  "author": "calcium",
   "timestamp": "2026-03-22T14:32:01Z",
   "payload": {
     "severity": "value://high",
