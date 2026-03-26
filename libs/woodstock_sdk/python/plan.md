@@ -1,9 +1,9 @@
 # Implementation Plan
 
-## Dependency on scenarios and implementation_nodes.md
+## Dependency on scenarios and implementation_notes.md
 
 This plan depends on scenarios stored in extra/spec_src/scenarios.
-Each scenario may have an assocatiated implementation_nodes.md document that should also be consulted.
+Each scenario may have an assocatiated implementation_notes.md document that should also be consulted.
 
 ## Phases
 
@@ -14,9 +14,9 @@ Each scenario may have an assocatiated implementation_nodes.md document that sho
 - [ ] `Storage.Models.S3FileStorage` — boto3 implementation
 - [ ] Settings: select backend from environment (`s3_bucket` → S3, `base_path` → LocalFs)
 
-> See [ms1](extra/spec_src/scenarios/ms1_woodstock_uses_a_pluggable_file_storage/scenario.py) for interface contract and `list_files` cursor semantics.
+> See [ms1](extra/spec_src/scenarios/ms1_woodstock_uses_a_pluggable_file_storage/scenario.py) for interface contract and `list_files` cursor semantics. See implementation_notes.md about reusing code from calcium_sdk.
 
-Manual test: instantiate `LocalFsFileStorage`, call `put_file`, `get_file`, `list_files` with a `start_after` cursor, `delete_files`.
+Write a once-off test: instantiate `LocalFsFileStorage`, call `put_file`, `get_file`, `list_files` with a `start_after` cursor, `delete_files`. Run the once-off and fix bugs if needed.
 
 ---
 

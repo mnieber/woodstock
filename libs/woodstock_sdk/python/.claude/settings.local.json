@@ -1,0 +1,8 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(pip install:*)",
+      "Bash(pytest tests/test_phase1_file_storage.py -vv)"
+    ]
+  }
+}
