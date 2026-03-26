@@ -60,7 +60,6 @@ Depends on: Phase 2
 
 Depends on: Phases 2 and 4
 
-- [ ] Maarten will create the basic django-admin file structure for woodstock_server
 - [ ] `WoodstockServer.Index.Models.IndexState` — persists `last_seen_key`
 - [ ] `WoodstockServer.Index.Models.TraceRecord` (server-side view)
 - [ ] `WoodstockServer.Index.Actions.UpsertTrace` — inserts/updates row in DuckDB
