@@ -19,7 +19,7 @@ const currentDir = path.dirname(currentFilePath);
 const rootDir = path.dirname(currentDir);
 
 relPaths = [
-  ['libs/woodstock_sdk/python/src/', 'woodstock_sdk'],
+  ['libs/woodstock/src/', 'woodstock'],
 ];
 
 module.exports = {

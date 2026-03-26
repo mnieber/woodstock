@@ -1,0 +1,7 @@
+output_dir: ../../docs/spec
+component_name: woodstock
+package_config_by_name:
+  woodstock:
+    output_dir: .
+    scenario_paths:
+      - scenarios/**/scenario.py
