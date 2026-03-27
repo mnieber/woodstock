@@ -1,6 +1,7 @@
 from dataclassy import dataclass
 
 from woodstock.server.models.index_state import IndexState
+from woodstock.storage.actions.delete_traces import DeleteTracesForm, delete_traces
 from woodstock.storage.models.file_storage import FileStorage
 
 
@@ -22,17 +23,10 @@ def delete_old_traces(
     if not rows:
         return
 
-    trace_log_paths = [f"traces/{uuidv7}.json" for uuidv7, _ in rows]
-    file_storage.delete_files(trace_log_paths)
-
-    tree_prefixes = {trace_key for _, trace_key in rows}
-    tree_paths = []
-    for prefix in tree_prefixes:
-        tree_paths.extend(file_storage.list_files(f"tree/{prefix}"))
-    if tree_paths:
-        file_storage.delete_files(tree_paths)
-
     uuidv7s = [uuidv7 for uuidv7, _ in rows]
+    trace_keys = [trace_key for _, trace_key in rows]
+    delete_traces(DeleteTracesForm(uuidv7s=uuidv7s, trace_keys=trace_keys), file_storage)
+
     placeholders = ", ".join("?" * len(uuidv7s))
     index_state.conn.execute(
         f"DELETE FROM traces WHERE uuidv7 IN ({placeholders})", uuidv7s
