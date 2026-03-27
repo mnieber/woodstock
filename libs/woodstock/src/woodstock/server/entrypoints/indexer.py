@@ -6,7 +6,7 @@ import duckdb
 
 from woodstock.server.actions.poll_trace_log import PollTraceLogForm, poll_trace_log
 from woodstock.server.models.index_state import IndexState
-from woodstock.settings import WOODSTOCK_POLL_INTERVAL_SECONDS
+from woodstock.settings import WOODSTOCK_DUCKDB_PATH, WOODSTOCK_POLL_INTERVAL_SECONDS
 from woodstock.storage.rules.get_file_storage import get_file_storage
 
 logger = logging.getLogger(__name__)
@@ -28,7 +28,7 @@ def main() -> None:
 
     file_storage = get_file_storage()
 
-    conn = duckdb.connect()
+    conn = duckdb.connect(WOODSTOCK_DUCKDB_PATH)
     index_state = IndexState(conn=conn)
 
     while True:

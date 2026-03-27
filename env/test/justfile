@@ -38,9 +38,32 @@ setup:
 run-indexer:
     @just _run_image "woodstock-indexer" "false" "false" woodstock-indexer --no-loop
 
+# Start woodstock-server in the background (detached)
+start-server:
+    #!/usr/bin/env bash
+    set -euox pipefail
+    DOCKER_BUILDKIT=1 \
+    COMPOSE_PROJECT_NAME=${COMPOSE_PROJECT_NAME} \
+    ROOT_DIR="${ROOT_DIR}" \
+    docker compose \
+        --file "${COMPOSE_DIR}/docker-compose.yml" \
+        up --detach woodstock-server
+
+# Stop woodstock-server
+stop-server:
+    #!/usr/bin/env bash
+    set -euox pipefail
+    DOCKER_BUILDKIT=1 \
+    COMPOSE_PROJECT_NAME=${COMPOSE_PROJECT_NAME} \
+    ROOT_DIR="${ROOT_DIR}" \
+    docker compose \
+        --file "${COMPOSE_DIR}/docker-compose.yml" \
+        stop woodstock-server
+
 # Run the integration tests
 test:
     #!/usr/bin/env bash
     set -euox pipefail
+    pip install -q -r requirements.txt
     set -a && source docker/env_files/woodstock-test-runner.env && set +a
     JUST_DIR="{{justfile_directory()}}" python -m pytest tests/ -v

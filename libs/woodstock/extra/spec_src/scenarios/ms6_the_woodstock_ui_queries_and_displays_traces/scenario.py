@@ -19,7 +19,7 @@ def run_scenario():
     r.trace_list = Server.Models.TraceList
     r.blob_content = Server.Models.BlobContent
     r.delete_old_traces_action = Server.Actions.DeleteOldTraces
-    r.retention_period = Server.Models.RetentionPeriod
+    r.retention_days = Server.Models.RetentionDays
     r.file_storage = Storage.Models.FileStorage
 
     with goal().display_a(r.trace_list).with_the(r.blob_content).for_the(r.user):
@@ -44,12 +44,12 @@ def run_scenario():
 
     with goal().delete_traces_older_than_the(r.retention_period):
         with the(r.operator).runs_the(r.delete_old_traces_entrypoint).with_the(
-            r.retention_period
+            r.retention_days
         ):
-            it().calls_the(r.delete_old_traces_action).with_the(r.retention_period)
+            it().calls_the(r.delete_old_traces_action).with_the(r.retention_days)
 
         with the(r.delete_old_traces_action).deletes_traces_older_than_the(
-            r.retention_period
+            r.retention_days
         ):
             it().calls_the(r.file_storage).delete_files(r.trace_log_entries)
             it().calls_the(r.file_storage).delete_files(r.trace_records)
@@ -70,9 +70,8 @@ sees the full trace — including any Markdown documents or JSON blobs — witho
 through.
 
 An operator can also run the `delete-old-traces` CLI entrypoint to delete traces older than a
-chosen retention period (one week, two weeks, or one month). The entrypoint calls `DeleteOldTraces`
-directly, which removes the matching entries from the S3 trace log, the S3 tree, and the
-DuckDB index.
+given number of days. The entrypoint calls `DeleteOldTraces` directly, which removes the
+matching entries from the S3 trace log, the S3 tree, and the DuckDB index.
 
 The woodstock-server is a Bottle-based HTTP server.
 
@@ -105,9 +104,9 @@ is required.</br>
 
 ### It deletes old traces via the CLI
 
-An operator runs the `delete-old-traces` entrypoint with a `--retention-period` argument
-(one-week, two-weeks, or one-month).</br>
-The entrypoint calls `DeleteOldTraces` with the chosen `RetentionPeriod`.</br>
+An operator runs the `delete-old-traces` entrypoint with a `--retention-days` argument (integer
+number of days).</br>
+The entrypoint calls `DeleteOldTraces` with the given number of days.</br>
 `DeleteOldTraces` calls `FileStorage.delete_files` for the matching trace log entries, then
 again for the corresponding tree objects, and finally purges the matching rows from the
 DuckDB index.</br>
@@ -141,7 +140,7 @@ sequenceDiagram
     UI->>UI: render trace tree (values, links, refs, blobs)
     UI-->>User: trace tree view
 
-    Operator->>DeleteOldTraces: delete-old-traces --retention-period one-week
+    Operator->>DeleteOldTraces: delete-old-traces --retention-days 7
     DeleteOldTraces->>FileStorage: delete_files(trace log entries older than cutoff)
     DeleteOldTraces->>FileStorage: delete_files(tree objects for deleted traces)
     DeleteOldTraces->>DuckDB: DELETE rows older than cutoff
@@ -154,6 +153,6 @@ sequenceDiagram
 | QueryTraces | `c.Woodstock.Server.Actions.QueryTraces` |
 | FetchBlob | `c.Woodstock.Server.Actions.FetchBlob` |
 | DeleteOldTraces | `c.Woodstock.Server.Actions.DeleteOldTraces` |
-| RetentionPeriod | `c.Woodstock.Server.Models.RetentionPeriod` |
+| RetentionDays | integer number of days passed directly as a CLI argument |
 | FileStorage | `c.Woodstock.Storage.Models.FileStorage` |
 """

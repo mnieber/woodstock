@@ -1,3 +1,6 @@
+volumes:
+  woodstock-duckdb:
+
 services:
   woodstock-indexer:
     build:
@@ -10,6 +13,22 @@ services:
     image: woodstock_indexer_test
     volumes:
       - ${ROOT_DIR}/libs/woodstock:/app/libs/woodstock
+      - woodstock-duckdb:/duckdb
+  woodstock-server:
+    build:
+      context: ${ROOT_DIR}
+      dockerfile: services/woodstock-server/Dockerfile.local
+    depends_on:
+      localstack: {condition: service_healthy}
+    env_file:
+      - env_files/woodstock-server.env
+    image: woodstock_server_test
+    ports:
+      - "8080:8080"
+    volumes:
+      - ${ROOT_DIR}/libs/woodstock:/app/libs/woodstock
+      - woodstock-duckdb:/duckdb
+    command: ["woodstock-server"]
   localstack:
     container_name: woodstock_localstack_test
     image: "localstack/localstack:3.4.0"

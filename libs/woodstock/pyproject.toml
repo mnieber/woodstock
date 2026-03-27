@@ -2,13 +2,15 @@
 name = "woodstock"
 version = "0.1.0"
 readme = "README.md"
-dependencies = ["dataclassy", "duckdb", "boto3"]
+dependencies = ["dataclassy", "duckdb", "boto3", "bottle"]
 
 [project.optional-dependencies]
 test = ["pytest>=7.0.0", "pytest-cov>=4.0.0", "moto[s3]>=4.0.0"]
 
 [project.scripts]
 woodstock-indexer = "woodstock.server.entrypoints.indexer:main"
+woodstock-server = "woodstock.server.entrypoints.woodstocker_server:main"
+delete-old-traces = "woodstock.server.entrypoints.delete_old_traces:main"
 
 [tool.setuptools.package-dir]
 "" = "src"
