@@ -1,0 +1,37 @@
+services:
+  woodstock-indexer:
+    build:
+      context: ${ROOT_DIR}
+      dockerfile: services/woodstock-indexer/Dockerfile.local
+    command: sleep infinity
+    depends_on:
+      localstack: {condition: service_healthy}
+    env_file:
+      - env_files/woodstock-indexer.env
+    image: woodstock_indexer_local
+  woodstock-server:
+    build:
+      context: ${ROOT_DIR}
+      dockerfile: services/woodstock-server/Dockerfile.local
+    command: sleep infinity
+    depends_on:
+      localstack: {condition: service_healthy}
+    env_file:
+      - env_files/woodstock-server.env
+    image: woodstock_server_local
+    ports:
+      - 8000:8000
+  localstack:
+    container_name: woodstock_localstack
+    image: "localstack/localstack:3.4.0"
+    ports:
+      - 4566:4566
+    env_file:
+      - env_files/localstack.env
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:4566/health"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    volumes:
+      - "${ROOT_DIR}/localstack/scripts/initaws.d:/docker-entrypoint-initaws.d"

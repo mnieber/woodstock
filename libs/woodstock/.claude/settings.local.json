@@ -8,7 +8,8 @@
       "Bash(python3 -c \"import uuid; help\\(uuid.uuid4\\)\")",
       "Bash(pip list:*)",
       "Bash(pytest:*)",
-      "Bash(find /home/maarten/projects/woodstock/src/libs/woodstock/instructions -name *.py)"
+      "Bash(find /home/maarten/projects/woodstock/src/libs/woodstock/instructions -name *.py)",
+      "Bash(chmod:*)"
     ]
   }
 }

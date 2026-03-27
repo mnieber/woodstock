@@ -1,0 +1,23 @@
+FROM python:3.10
+
+RUN pip install --upgrade pip
+
+# Install uv
+RUN curl -LsSf https://astral.sh/uv/install.sh | sh
+ENV PATH="/root/.local/bin:${PATH}"
+
+# Install just
+RUN curl --proto '=https' --tlsv1.2 -sSf https://just.systems/install.sh | bash -s -- --to /usr/local/bin
+
+# Install dev tools
+RUN apt-get update && apt-get install -y \
+    curl \
+    fish \
+    entr
+
+# Copy and install the woodstock library
+COPY libs/woodstock/pyproject.toml libs/woodstock/setup.py libs/woodstock/README.md /app/libs/woodstock/
+RUN --mount=type=cache,target=/root/.cache/uv \
+    uv pip install --system --break-system-packages -e /app/libs/woodstock
+
+WORKDIR /app/libs/woodstock

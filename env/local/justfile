@@ -1,0 +1,50 @@
+export COMPOSE_PROJECT_NAME := "woodstock_local"
+export ROOT_DIR := `git -C {{justfile_directory()}} rev-parse --show-toplevel`
+export COMPOSE_DIR := justfile_directory() + "/docker"
+
+import 'just/_build_images.just'
+import 'just/_up.just'
+import 'just/_down.just'
+import 'just/_run_image.just'
+
+# Compile .env.in templates into .env files
+compile-env-files:
+    python scripts/compile_env_files.py \
+        --input secrets.env \
+        docker/env_files
+
+# Build all images
+build *args:
+    @just _build_images "{{ args }}" "false"
+
+# Build all images without cache
+build-no-cache *args:
+    @just _build_images "{{ args }}" "true"
+
+# Start services
+up *args:
+    @just _up "{{ args }}" "false"
+
+# Start services (with override file)
+up-override *args:
+    @just _up "{{ args }}" "true"
+
+# Stop services
+down:
+    @just _down "false"
+
+# Stop services (with override file)
+down-override:
+    @just _down "true"
+
+# Run woodstock-indexer once (--no-loop)
+run-indexer:
+    @just _run_image "woodstock-indexer" "false" woodstock-indexer --no-loop
+
+# Shell into woodstock-indexer
+shell-indexer:
+    @just _run_image "woodstock-indexer" "false"
+
+# Shell into woodstock-server
+shell-server:
+    @just _run_image "woodstock-server" "false"
