@@ -8,19 +8,17 @@ scenario = sunya.add_scenario("ms6_the_woodstock_ui_queries_and_displays_traces"
 
 def run_scenario():
     Server = c.Woodstock.Server
-    Traces = c.Woodstock.Traces
     Storage = c.Woodstock.Storage
     External = c.External
 
     r.user = External.Actors.User
     r.woodstock_ui = External.Actors.WoodstockUi
-    r.django_admin = External.Actors.DjangoAdmin
+    r.operator = External.Actors.Operator
     r.query_traces_action = Server.Actions.QueryTraces
     r.fetch_blob_action = Server.Actions.FetchBlob
     r.trace_list = Server.Models.TraceList
     r.blob_content = Server.Models.BlobContent
     r.delete_old_traces_action = Server.Actions.DeleteOldTraces
-    r.delete_traces_action = Traces.Actions.DeleteTraces
     r.retention_period = Server.Models.RetentionPeriod
     r.file_storage = Storage.Models.FileStorage
 
@@ -45,12 +43,12 @@ def run_scenario():
             it().renders_the(r.blob_content).in_the(r.documents_section)
 
     with goal().delete_traces_older_than_the(r.retention_period):
-        with the(r.django_admin).selects_the(r.retention_period).and_triggers_the(
-            r.delete_old_traces_action
+        with the(r.operator).runs_the(r.delete_old_traces_entrypoint).with_the(
+            r.retention_period
         ):
-            it().calls_the(r.delete_traces_action).with_the(r.retention_period)
+            it().calls_the(r.delete_old_traces_action).with_the(r.retention_period)
 
-        with the(r.delete_traces_action).deletes_traces_older_than_the(
+        with the(r.delete_old_traces_action).deletes_traces_older_than_the(
             r.retention_period
         ):
             it().calls_the(r.file_storage).delete_files(r.trace_log_entries)
@@ -63,14 +61,20 @@ markdown_node = sunya.add_markdown_node(
 )
 markdown_node.markdown = """
 The woodstock UI lets a user browse and filter the trace tree. It queries the woodstock-server,
-which answers from its DuckDB index. When rendering a trace, all `tree://` payload references
-are fetched immediately so the user sees the full trace — including any Markdown documents or
-JSON blobs — without having to click through.
+which answers from its DuckDB index. The indexer and the server share a DuckDB file on disk
+(path configured via `WOODSTOCK_DUCKDB_PATH`), so traces written by the indexer are immediately
+queryable by the server.
 
-An administrator can also use the django-admin to delete traces older than a chosen retention
-period (one week, two weeks, or one month). The woodstock-server delegates the actual deletion
-to `DeleteTraces` in woodstock, which removes the matching entries from the S3 trace
-log, the S3 tree, and the DuckDB index.
+When rendering a trace, all `tree://` payload references are fetched immediately so the user
+sees the full trace — including any Markdown documents or JSON blobs — without having to click
+through.
+
+An operator can also run the `delete-old-traces` CLI entrypoint to delete traces older than a
+chosen retention period (one week, two weeks, or one month). The entrypoint calls `DeleteOldTraces`
+directly, which removes the matching entries from the S3 trace log, the S3 tree, and the
+DuckDB index.
+
+The woodstock-server is a Bottle-based HTTP server.
 
 ## Steps
 
@@ -85,7 +89,8 @@ The UI sends the filter to the `QueryTraces` action on the woodstock-server.</br
 `QueryTraces` translates the filter into a DuckDB query and returns a `TraceList`.</br>
 The response includes `trace_key`, `trace_state`, `author`, `timestamp`, and the full payload
 for each matching trace.</br>
-Because the index is local to the server, this query is fast even over large trace histories.</br>
+Because the index is a local DuckDB file shared with the indexer, this query is fast even over
+large trace histories.</br>
 
 ### It renders the trace tree and fetches all blobs
 
@@ -98,13 +103,14 @@ which calls `FileStorage.get_file(tree_path)` and returns the content as `BlobCo
 The blob is rendered immediately in the documents section — no additional user interaction
 is required.</br>
 
-### It deletes old traces via the django-admin
+### It deletes old traces via the CLI
 
-An administrator opens the django-admin and selects a `RetentionPeriod` (one week, two weeks,
-or one month), then triggers the `DeleteOldTraces` action on the woodstock-server.</br>
-`DeleteOldTraces` calls `DeleteTraces` in woodstock, passing the chosen retention period.</br>
-`DeleteTraces` calls `FileStorage.delete_files` for the matching trace log entries, then again
-for the corresponding tree objects, and finally purges the matching rows from the DuckDB index.</br>
+An operator runs the `delete-old-traces` entrypoint with a `--retention-period` argument
+(one-week, two-weeks, or one-month).</br>
+The entrypoint calls `DeleteOldTraces` with the chosen `RetentionPeriod`.</br>
+`DeleteOldTraces` calls `FileStorage.delete_files` for the matching trace log entries, then
+again for the corresponding tree objects, and finally purges the matching rows from the
+DuckDB index.</br>
 
 ## Diagram
 
@@ -116,9 +122,8 @@ sequenceDiagram
     participant DuckDB
     participant FetchBlob as FetchBlob (action)
     participant FileStorage
-    participant Admin as DjangoAdmin
+    participant Operator
     participant DeleteOldTraces as DeleteOldTraces (action)
-    participant DeleteTraces as DeleteTraces (action)
 
     User->>UI: open / apply filter
     UI->>QueryTraces: query_traces(filter)
@@ -136,21 +141,19 @@ sequenceDiagram
     UI->>UI: render trace tree (values, links, refs, blobs)
     UI-->>User: trace tree view
 
-    Admin->>DeleteOldTraces: delete_old_traces(retention_period)
-    DeleteOldTraces->>DeleteTraces: delete_traces(retention_period)
-    DeleteTraces->>FileStorage: delete_files(trace log entries older than cutoff)
-    DeleteTraces->>FileStorage: delete_files(tree objects for deleted traces)
-    DeleteTraces->>DuckDB: DELETE rows older than cutoff
+    Operator->>DeleteOldTraces: delete-old-traces --retention-period one-week
+    DeleteOldTraces->>FileStorage: delete_files(trace log entries older than cutoff)
+    DeleteOldTraces->>FileStorage: delete_files(tree objects for deleted traces)
+    DeleteOldTraces->>DuckDB: DELETE rows older than cutoff
 ```
 
 ### Legend
 
 | Participant | Module path |
 |---|---|
-| QueryTraces | `c.Woodstock.Serve.Actions.QueryTraces` |
-| FetchBlob | `c.Woodstock.Serve.Actions.FetchBlob` |
-| DeleteOldTraces | `c.Woodstock.Serve.Actions.DeleteOldTraces` |
-| DeleteTraces | `c.Woodstock.Traces.Actions.DeleteTraces` |
-| RetentionPeriod | `c.Woodstock.Serve.Models.RetentionPeriod` |
+| QueryTraces | `c.Woodstock.Server.Actions.QueryTraces` |
+| FetchBlob | `c.Woodstock.Server.Actions.FetchBlob` |
+| DeleteOldTraces | `c.Woodstock.Server.Actions.DeleteOldTraces` |
+| RetentionPeriod | `c.Woodstock.Server.Models.RetentionPeriod` |
 | FileStorage | `c.Woodstock.Storage.Models.FileStorage` |
 """

@@ -71,16 +71,33 @@ Manual test: write a few traces via Phase 2, run `PollTraceLog`, verify DuckDB r
 
 ---
 
-### Phase 6 — UI queries and displays traces; retention (ms5)
+### Phase 6 — UI queries and displays traces; retention (ms6)
 
 Depends on: Phases 3, 4, and 5
 Scope: this phase covers the server side. The UI will be implemented in a separate phase later.
 
-- [ ] `Woodstock.Server.Actions.QueryTraces` — DuckDB query with filter (prefix, state, author, time range), returns `TraceList`
-- [ ] `Woodstock.Server.Models.TraceList`, `BlobContent`
-- [ ] `Woodstock.Server.Actions.FetchBlob` — calls `FileStorage.get_file`, returns `BlobContent`
-- [ ] `Woodstock.Traces.Actions.DeleteTraces` — deletes trace log entries, tree objects, DuckDB rows for a retention cutoff
-- [ ] `Woodstock.Server.Actions.DeleteOldTraces` — django-admin entry point, delegates to `DeleteTraces`
-- [ ] `Woodstock.Server.Models.RetentionPeriod`
+**Models:**
+- [ ] `Woodstock.Server.Models.TraceList`
+- [ ] `Woodstock.Server.Models.BlobContent`
+- [ ] `Woodstock.Server.Models.RetentionPeriod` — enum: one-week, two-weeks, one-month
 
-> See [ms5](extra/spec_src/scenarios/ms6_the_woodstock_ui_queries_and_displays_traces/scenario.py).
+**Actions:**
+- [ ] `Woodstock.Server.Actions.QueryTraces` — queries shared DuckDB file with optional filter (prefix, state, author, time range), returns `TraceList`
+- [ ] `Woodstock.Server.Actions.FetchBlob` — calls `FileStorage.get_file(tree_path)`, returns `BlobContent`
+- [ ] `Woodstock.Server.Actions.DeleteOldTraces` — deletes matching trace log entries and tree objects via `FileStorage`, purges DuckDB rows older than the retention cutoff
+
+**Entrypoints:**
+- [ ] `Woodstock.Server.Entrypoints.WoodstockerServer` — Bottle HTTP server exposing `QueryTraces` and `FetchBlob`
+- [ ] `Woodstock.Server.Entrypoints.DeleteOldTraces` — CLI entrypoint; parses `--retention-period`, calls `DeleteOldTraces`
+
+**Settings:**
+- [ ] Add `WOODSTOCK_DUCKDB_PATH` to `settings.py` — path to the shared DuckDB file used by both the indexer and the server
+
+**pyproject.toml:**
+- [ ] Add `woodstock-server` and `delete-old-traces` to `[project.scripts]`
+- [ ] Add `bottle` to dependencies
+
+**Integration test:**
+- [ ] `env/test/tests/test_server.py` — writes traces, runs indexer, queries the server's `QueryTraces` endpoint, asserts returned `TraceList` is correct
+
+> See [ms6](extra/spec_src/scenarios/ms6_the_woodstock_ui_queries_and_displays_traces/scenario.py).
