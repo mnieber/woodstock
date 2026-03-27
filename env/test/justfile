@@ -1,6 +1,7 @@
 export COMPOSE_PROJECT_NAME := "woodstock_test"
 export ROOT_DIR := `git rev-parse --show-toplevel`
 export COMPOSE_DIR := justfile_directory() + "/docker"
+export SHARED_DIR := "/opt/projects/woodstock/test-env"
 
 import 'just/_build_images.just'
 import 'just/_up.just'
@@ -37,6 +38,10 @@ setup:
 # Run woodstock-indexer once (--no-loop)
 run-indexer:
     @just _run_image "woodstock-indexer" "false" "false" woodstock-indexer --no-loop
+
+# Wipe the shared DuckDB directory
+wipe-duckdb:
+    rm -f "${SHARED_DIR}/duckdb/woodstock.duckdb"
 
 # Start woodstock-server in the background (detached)
 start-server:

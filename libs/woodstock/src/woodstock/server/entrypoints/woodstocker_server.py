@@ -68,7 +68,7 @@ def main() -> None:
     args = _parse_args()
 
     _file_storage = get_file_storage()
-    conn = duckdb.connect(WOODSTOCK_DUCKDB_PATH)
+    conn = duckdb.connect(WOODSTOCK_DUCKDB_PATH, read_only=True)
     _index_state = IndexState(conn=conn)
 
     bottle.run(app, host=args.host, port=args.port)
