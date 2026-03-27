@@ -12,4 +12,4 @@ WOODSTOCK_LOCAL_STORAGE_DIR: Path = Path(
 )
 WOODSTOCK_AWS_REGION: str = os.environ.get("WOODSTOCK_AWS_REGION", "eu-central-1")
 WOODSTOCK_POLL_INTERVAL_SECONDS: int = int(os.environ.get("WOODSTOCK_POLL_INTERVAL_SECONDS", "60"))
-WOODSTOCK_DUCKDB_PATH: str = os.environ.get("WOODSTOCK_DUCKDB_PATH", "/tmp/woodstock.duckdb")
+WOODSTOCK_DB_PATH: str = os.environ.get("WOODSTOCK_DB_PATH", "/tmp/woodstock.db")

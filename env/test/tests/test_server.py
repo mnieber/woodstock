@@ -18,21 +18,27 @@ def wipe_state():
     paths = storage.list_files("")
     if paths:
         storage.delete_files(paths)
-    just("wipe-duckdb")
+    just("wipe-db")
 
 
-def _start_server():
+@pytest.fixture()
+def server():
+    """Start the server, yield, then stop it."""
     just("start-server")
     for _ in range(20):
         try:
             requests.get(f"{SERVER_URL}/query-traces", timeout=1)
-            return
+            break
         except Exception:
             time.sleep(1)
-    raise RuntimeError("woodstock-server did not become ready in time")
+    else:
+        just("stop-server")
+        raise RuntimeError("woodstock-server did not become ready in time")
+    yield
+    just("stop-server")
 
 
-def test_query_traces_returns_indexed_traces():
+def test_query_traces_returns_indexed_traces(server):
     storage = S3FileStorage(bucket_name=BUCKET)
 
     write_trace(WriteTraceForm(
@@ -48,20 +54,18 @@ def test_query_traces_returns_indexed_traces():
         payload={},
     ), storage)
 
+    # Server is already running when the indexer writes — concurrent access.
     just("run-indexer")
-    _start_server()
-    try:
-        response = requests.get(f"{SERVER_URL}/query-traces")
-        assert response.status_code == 200
-        data = response.json()
-        assert len(data["items"]) == 2
-        trace_keys = {item["trace_key"] for item in data["items"]}
-        assert trace_keys == {"job-1/step-1", "job-1/step-2"}
-    finally:
-        just("stop-server")
+
+    response = requests.get(f"{SERVER_URL}/query-traces")
+    assert response.status_code == 200
+    data = response.json()
+    assert len(data["items"]) == 2
+    trace_keys = {item["trace_key"] for item in data["items"]}
+    assert trace_keys == {"job-1/step-1", "job-1/step-2"}
 
 
-def test_query_traces_filters_by_prefix():
+def test_query_traces_filters_by_prefix(server):
     storage = S3FileStorage(bucket_name=BUCKET)
 
     write_trace(WriteTraceForm(
@@ -77,13 +81,11 @@ def test_query_traces_filters_by_prefix():
         payload={},
     ), storage)
 
+    # Server is already running when the indexer writes — concurrent access.
     just("run-indexer")
-    _start_server()
-    try:
-        response = requests.get(f"{SERVER_URL}/query-traces", params={"trace_key_prefix": "job-1"})
-        assert response.status_code == 200
-        data = response.json()
-        assert len(data["items"]) == 1
-        assert data["items"][0]["trace_key"] == "job-1/step-1"
-    finally:
-        just("stop-server")
+
+    response = requests.get(f"{SERVER_URL}/query-traces", params={"trace_key_prefix": "job-1"})
+    assert response.status_code == 200
+    data = response.json()
+    assert len(data["items"]) == 1
+    assert data["items"][0]["trace_key"] == "job-1/step-1"

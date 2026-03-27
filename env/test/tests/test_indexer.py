@@ -14,7 +14,7 @@ def wipe_state():
     paths = storage.list_files("")
     if paths:
         storage.delete_files(paths)
-    just("wipe-duckdb")
+    just("wipe-db")
 
 
 def test_indexer_runs_without_error():

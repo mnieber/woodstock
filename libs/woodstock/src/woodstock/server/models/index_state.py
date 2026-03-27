@@ -1,7 +1,8 @@
-import duckdb
+import sqlite3
+
 from dataclassy import dataclass
 
 
 @dataclass
 class IndexState:
-    conn: duckdb.DuckDBPyConnection
+    conn: sqlite3.Connection

@@ -1,3 +1,4 @@
+import json
 import typing as T
 
 from dataclassy import dataclass
@@ -47,8 +48,8 @@ def query_traces(form: QueryTracesForm, index_state: IndexState) -> TraceList:
             trace_state=row[1],
             author=row[2],
             timestamp=row[3],
-            payload=row[4] if row[4] else {},
-            labels=row[5] if row[5] else {},
+            payload=json.loads(row[4]) if row[4] else {},
+            labels=json.loads(row[5]) if row[5] else {},
         )
         for row in rows
     ]

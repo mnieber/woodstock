@@ -15,9 +15,9 @@ def delete_old_traces(
     file_storage: FileStorage,
     index_state: IndexState,
 ) -> None:
-    cutoff = f"now() - INTERVAL {form.retention_days} DAYS"
     rows = index_state.conn.execute(
-        f"SELECT uuidv7, trace_key FROM traces WHERE CAST(timestamp AS TIMESTAMP) < {cutoff}"
+        "SELECT uuidv7, trace_key FROM traces WHERE timestamp < datetime('now', ? || ' days')",
+        (f"-{form.retention_days}",),
     ).fetchall()
 
     if not rows:

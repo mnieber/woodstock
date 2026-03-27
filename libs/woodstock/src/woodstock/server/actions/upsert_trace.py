@@ -1,3 +1,4 @@
+import json
 import logging
 
 from dataclassy import dataclass
@@ -19,54 +20,52 @@ def upsert_trace(form: UpsertTraceForm, index_state: IndexState) -> None:
     conn.execute(
         """
         CREATE TABLE IF NOT EXISTS traces (
-            uuidv7       VARCHAR PRIMARY KEY,
-            trace_key    VARCHAR,
-            trace_state  VARCHAR,
-            author       VARCHAR,
-            timestamp    VARCHAR,
-            payload      JSON,
-            labels       JSON
+            uuidv7       TEXT PRIMARY KEY,
+            trace_key    TEXT,
+            trace_state  TEXT,
+            author       TEXT,
+            timestamp    TEXT,
+            payload      TEXT,
+            labels       TEXT
         )
         """
     )
     conn.execute(
         """
         CREATE TABLE IF NOT EXISTS index_meta (
-            key    VARCHAR PRIMARY KEY,
-            value  VARCHAR
+            key    TEXT PRIMARY KEY,
+            value  TEXT
         )
         """
     )
-    with conn.cursor() as cur:
-        cur.execute("BEGIN")
-        cur.execute(
-            """
-            INSERT INTO traces (uuidv7, trace_key, trace_state, author, timestamp, payload, labels)
-            VALUES (?, ?, ?, ?, ?, ?, ?)
-            ON CONFLICT (uuidv7) DO UPDATE SET
-                trace_key   = excluded.trace_key,
-                trace_state = excluded.trace_state,
-                author      = excluded.author,
-                timestamp   = excluded.timestamp,
-                payload     = excluded.payload,
-                labels      = excluded.labels
-            """,
-            [
-                form.uuidv7,
-                form.trace_record.trace_key,
-                form.trace_record.trace_state,
-                form.trace_record.author,
-                form.trace_record.timestamp,
-                form.trace_record.payload,
-                form.trace_record.labels,
-            ],
-        )
-        cur.execute(
-            """
-            INSERT INTO index_meta (key, value) VALUES ('last_seen_key', ?)
-            ON CONFLICT (key) DO UPDATE SET value = excluded.value
-            """,
-            [f"traces/{form.uuidv7}.json"],
-        )
-        cur.execute("COMMIT")
+    conn.execute(
+        """
+        INSERT INTO traces (uuidv7, trace_key, trace_state, author, timestamp, payload, labels)
+        VALUES (?, ?, ?, ?, ?, ?, ?)
+        ON CONFLICT (uuidv7) DO UPDATE SET
+            trace_key   = excluded.trace_key,
+            trace_state = excluded.trace_state,
+            author      = excluded.author,
+            timestamp   = excluded.timestamp,
+            payload     = excluded.payload,
+            labels      = excluded.labels
+        """,
+        (
+            form.uuidv7,
+            form.trace_record.trace_key,
+            form.trace_record.trace_state,
+            form.trace_record.author,
+            form.trace_record.timestamp,
+            json.dumps(form.trace_record.payload),
+            json.dumps(form.trace_record.labels),
+        ),
+    )
+    conn.execute(
+        """
+        INSERT INTO index_meta (key, value) VALUES ('last_seen_key', ?)
+        ON CONFLICT (key) DO UPDATE SET value = excluded.value
+        """,
+        (f"traces/{form.uuidv7}.json",),
+    )
+    conn.commit()
     logger.info("Upserted trace %s into index", form.uuidv7)

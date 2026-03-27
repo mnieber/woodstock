@@ -39,9 +39,9 @@ setup:
 run-indexer:
     @just _run_image "woodstock-indexer" "false" "false" woodstock run-indexer --no-loop
 
-# Wipe the shared DuckDB directory
-wipe-duckdb:
-    rm -f "${SHARED_DIR}/duckdb/woodstock.duckdb"
+# Wipe the shared SQLite db
+wipe-db:
+    rm -f "${SHARED_DIR}/db/woodstock.db" "${SHARED_DIR}/db/woodstock.db-wal" "${SHARED_DIR}/db/woodstock.db-shm"
 
 # Start woodstock-server in the background (detached)
 start-server:

@@ -1,24 +1,31 @@
 import argparse
 import logging
+import sqlite3
 import time
 
 import bottle
-import duckdb
 
 from woodstock.server.actions.delete_old_traces import DeleteOldTracesForm, delete_old_traces
 from woodstock.server.actions.poll_trace_log import PollTraceLogForm, poll_trace_log
 from woodstock.server.api_views.api_views import app
 from woodstock.server.models.index_state import IndexState
-from woodstock.settings import WOODSTOCK_DUCKDB_PATH, WOODSTOCK_POLL_INTERVAL_SECONDS
+from woodstock.settings import WOODSTOCK_DB_PATH, WOODSTOCK_POLL_INTERVAL_SECONDS
 from woodstock.storage.rules.get_file_storage import get_file_storage
 
 logger = logging.getLogger(__name__)
 
 
+def _open_db(read_only: bool = False) -> sqlite3.Connection:
+    conn = sqlite3.connect(WOODSTOCK_DB_PATH, check_same_thread=False)
+    conn.execute("PRAGMA journal_mode=WAL")
+    if read_only:
+        conn.execute("PRAGMA query_only=ON")
+    return conn
+
+
 def _run_indexer(args: argparse.Namespace) -> None:
     file_storage = get_file_storage()
-    conn = duckdb.connect(WOODSTOCK_DUCKDB_PATH)
-    index_state = IndexState(conn=conn)
+    index_state = IndexState(conn=_open_db())
 
     while True:
         poll_trace_log(PollTraceLogForm(), file_storage, index_state)
@@ -29,7 +36,7 @@ def _run_indexer(args: argparse.Namespace) -> None:
 
 def _run_server(args: argparse.Namespace) -> None:
     file_storage = get_file_storage()
-    index_state = IndexState(conn=duckdb.connect(WOODSTOCK_DUCKDB_PATH, read_only=True))
+    index_state = IndexState(conn=_open_db(read_only=True))
     app.config["file_storage"] = file_storage
     app.config["index_state"] = index_state
     bottle.run(app, host=args.host, port=args.port)
@@ -37,7 +44,7 @@ def _run_server(args: argparse.Namespace) -> None:
 
 def _delete_old_traces(args: argparse.Namespace) -> None:
     file_storage = get_file_storage()
-    index_state = IndexState(conn=duckdb.connect(WOODSTOCK_DUCKDB_PATH))
+    index_state = IndexState(conn=_open_db())
     delete_old_traces(
         DeleteOldTracesForm(retention_days=args.retention_days),
         file_storage,
