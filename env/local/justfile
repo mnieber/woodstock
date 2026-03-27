@@ -1,5 +1,5 @@
 export COMPOSE_PROJECT_NAME := "woodstock_local"
-export ROOT_DIR := `git -C {{justfile_directory()}} rev-parse --show-toplevel`
+export ROOT_DIR := `git rev-parse --show-toplevel`
 export COMPOSE_DIR := justfile_directory() + "/docker"
 
 import 'just/_build_images.just'

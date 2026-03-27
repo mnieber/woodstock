@@ -14,7 +14,11 @@
       "Bash(cp /home/maarten/projects/woodstock/src/env/local/just/_up.just /home/maarten/projects/woodstock/src/env/test/just/_up.just)",
       "Bash(cp /home/maarten/projects/woodstock/src/env/local/just/_down.just /home/maarten/projects/woodstock/src/env/test/just/_down.just)",
       "Bash(cp /home/maarten/projects/woodstock/src/env/local/just/_run_image.just /home/maarten/projects/woodstock/src/env/test/just/_run_image.just)",
-      "Bash(cp /home/maarten/projects/woodstock/src/env/local/scripts/compile_env_files.py /home/maarten/projects/woodstock/src/env/test/scripts/compile_env_files.py)"
+      "Bash(cp /home/maarten/projects/woodstock/src/env/local/scripts/compile_env_files.py /home/maarten/projects/woodstock/src/env/test/scripts/compile_env_files.py)",
+      "Bash(just compile-env-files:*)",
+      "Bash(just up:*)",
+      "Bash(just build:*)",
+      "Bash(just test:*)"
     ]
   }
 }

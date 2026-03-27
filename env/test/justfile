@@ -1,5 +1,5 @@
 export COMPOSE_PROJECT_NAME := "woodstock_test"
-export ROOT_DIR := `git -C {{justfile_directory()}} rev-parse --show-toplevel`
+export ROOT_DIR := `git rev-parse --show-toplevel`
 export COMPOSE_DIR := justfile_directory() + "/docker"
 
 import 'just/_build_images.just'
@@ -22,6 +22,17 @@ up *args:
 # Stop services
 down:
     @just _down "false" "false"
+
+# Start localstack and wait until healthy (bucket is created by the init script)
+setup:
+    #!/usr/bin/env bash
+    set -euox pipefail
+    just _up localstack "false" "false" -d
+    echo "Waiting for localstack to be healthy..."
+    until docker inspect --format='{{{{.State.Health.Status}}}}' woodstock_localstack_test | grep -q healthy; do
+        sleep 1
+    done
+    echo "Localstack is healthy."
 
 # Run woodstock-indexer once (--no-loop)
 run-indexer:
