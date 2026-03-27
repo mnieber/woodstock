@@ -1,4 +1,4 @@
-_run_image service_name use_override_file *cmd:
+_run_image service_name use_override_file use_src_overlays *cmd:
     #!/usr/bin/env bash
     set -euox pipefail
     DOCKER_BUILDKIT=1 \
@@ -6,6 +6,7 @@ _run_image service_name use_override_file *cmd:
     ROOT_DIR="${ROOT_DIR}" \
     docker compose \
         --file "${COMPOSE_DIR}/docker-compose.yml" \
+        {{ if use_src_overlays == "true" { "--file " + "${COMPOSE_DIR}/docker-compose.src-overlays.yml" } else { "" } }} \
         {{ if use_override_file == "true" { "--file " + "${COMPOSE_DIR}/docker-compose.override.yml" } else { "" } }} \
         run \
             --rm \

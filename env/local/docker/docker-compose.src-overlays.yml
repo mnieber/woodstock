@@ -1,0 +1,7 @@
+services:
+  woodstock-indexer:
+    volumes:
+      - ${ROOT_DIR}/libs/woodstock:/app/libs/woodstock
+  woodstock-server:
+    volumes:
+      - ${ROOT_DIR}/libs/woodstock:/app/libs/woodstock

@@ -21,30 +21,22 @@ build *args:
 build-no-cache *args:
     @just _build_images "{{ args }}" "true"
 
-# Start services
+# Start services (with src overlays)
 up *args:
-    @just _up "{{ args }}" "false"
-
-# Start services (with override file)
-up-override *args:
-    @just _up "{{ args }}" "true"
+    @just _up "{{ args }}" "false" "true"
 
 # Stop services
 down:
-    @just _down "false"
+    @just _down "false" "true"
 
-# Stop services (with override file)
-down-override:
-    @just _down "true"
-
-# Run woodstock-indexer once (--no-loop)
+# Run woodstock-indexer once (--no-loop), with src overlays
 run-indexer:
-    @just _run_image "woodstock-indexer" "false" woodstock-indexer --no-loop
+    @just _run_image "woodstock-indexer" "false" "true" woodstock-indexer --no-loop
 
-# Shell into woodstock-indexer
+# Shell into woodstock-indexer, with src overlays
 shell-indexer:
-    @just _run_image "woodstock-indexer" "false"
+    @just _run_image "woodstock-indexer" "false" "true"
 
-# Shell into woodstock-server
+# Shell into woodstock-server, with src overlays
 shell-server:
-    @just _run_image "woodstock-server" "false"
+    @just _run_image "woodstock-server" "false" "true"
