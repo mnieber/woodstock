@@ -35,9 +35,9 @@ setup:
     done
     echo "Localstack is healthy."
 
-# Run woodstock-indexer once (--no-loop)
+# Run woodstock indexer once (--no-loop)
 run-indexer:
-    @just _run_image "woodstock-indexer" "false" "false" woodstock-indexer --no-loop
+    @just _run_image "woodstock-indexer" "false" "false" woodstock run-indexer --no-loop
 
 # Wipe the shared DuckDB directory
 wipe-duckdb:

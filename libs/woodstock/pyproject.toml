@@ -8,9 +8,7 @@ dependencies = ["dataclassy", "duckdb", "boto3", "bottle"]
 test = ["pytest>=7.0.0", "pytest-cov>=4.0.0", "moto[s3]>=4.0.0"]
 
 [project.scripts]
-woodstock-indexer = "woodstock.server.entrypoints.indexer:main"
-woodstock-server = "woodstock.server.entrypoints.woodstocker_server:main"
-delete-old-traces = "woodstock.server.entrypoints.delete_old_traces:main"
+woodstock = "woodstock.server.entrypoints.woodstock:main"
 
 [tool.setuptools.package-dir]
 "" = "src"

@@ -25,7 +25,7 @@ services:
     volumes:
       - ${ROOT_DIR}/libs/woodstock:/app/libs/woodstock
       - ${SHARED_DIR}/duckdb:/duckdb
-    command: ["woodstock-server"]
+    command: ["woodstock", "run-server"]
   localstack:
     container_name: woodstock_localstack_test
     image: "localstack/localstack:3.4.0"
