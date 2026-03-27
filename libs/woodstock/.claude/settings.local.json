@@ -9,7 +9,12 @@
       "Bash(pip list:*)",
       "Bash(pytest:*)",
       "Bash(find /home/maarten/projects/woodstock/src/libs/woodstock/instructions -name *.py)",
-      "Bash(chmod:*)"
+      "Bash(chmod:*)",
+      "Bash(cp /home/maarten/projects/woodstock/src/env/local/just/_build_images.just /home/maarten/projects/woodstock/src/env/test/just/_build_images.just)",
+      "Bash(cp /home/maarten/projects/woodstock/src/env/local/just/_up.just /home/maarten/projects/woodstock/src/env/test/just/_up.just)",
+      "Bash(cp /home/maarten/projects/woodstock/src/env/local/just/_down.just /home/maarten/projects/woodstock/src/env/test/just/_down.just)",
+      "Bash(cp /home/maarten/projects/woodstock/src/env/local/just/_run_image.just /home/maarten/projects/woodstock/src/env/test/just/_run_image.just)",
+      "Bash(cp /home/maarten/projects/woodstock/src/env/local/scripts/compile_env_files.py /home/maarten/projects/woodstock/src/env/test/scripts/compile_env_files.py)"
     ]
   }
 }
