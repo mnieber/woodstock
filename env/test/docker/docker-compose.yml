@@ -18,9 +18,9 @@ services:
     env_file:
       - env_files/localstack.env
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:4566/health"]
+      test: ["CMD", "curl", "-f", "http://localhost:4566/_localstack/health"]
       interval: 5s
       timeout: 5s
       retries: 5
     volumes:
-      - "${ROOT_DIR}/localstack/scripts/initaws.d:/docker-entrypoint-initaws.d"
+      - "${ROOT_DIR}/localstack/scripts/initaws.d:/etc/localstack/init/ready.d"

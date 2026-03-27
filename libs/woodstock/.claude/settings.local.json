@@ -18,7 +18,9 @@
       "Bash(just compile-env-files:*)",
       "Bash(just up:*)",
       "Bash(just build:*)",
-      "Bash(just test:*)"
+      "Bash(just test:*)",
+      "Bash(just down:*)",
+      "Bash(just setup:*)"
     ]
   }
 }

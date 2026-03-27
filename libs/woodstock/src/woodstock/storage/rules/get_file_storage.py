@@ -10,7 +10,7 @@ def get_file_storage() -> FileStorage:
                 "WOODSTOCK_S3_BUCKET must be set when WOODSTOCK_FILE_STORAGE_TYPE=s3"
             )
         from woodstock.storage.models.s3_file_storage import S3FileStorage
-        return S3FileStorage(bucket=settings.WOODSTOCK_S3_BUCKET, region=settings.WOODSTOCK_AWS_REGION)
+        return S3FileStorage(bucket_name=settings.WOODSTOCK_S3_BUCKET, region_name=settings.WOODSTOCK_AWS_REGION)
 
     if settings.WOODSTOCK_FILE_STORAGE_TYPE == FileStorageType.LOCAL:
         from woodstock.storage.models.local_fs_file_storage import LocalFsFileStorage

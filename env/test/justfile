@@ -27,7 +27,7 @@ down:
 setup:
     #!/usr/bin/env bash
     set -euox pipefail
-    just _up localstack "false" "false" -d
+    just _up localstack "false" "false" "true"
     echo "Waiting for localstack to be healthy..."
     until docker inspect --format='{{{{.State.Health.Status}}}}' woodstock_localstack_test | grep -q healthy; do
         sleep 1
