@@ -9,17 +9,16 @@ scenario = sunya.add_scenario("ms5_the_woodstock_server_indexes_new_traces")
 def run_scenario():
     Server = c.Woodstock.Server
     Storage = c.Woodstock.Storage
-    External = c.External
 
     r.poll_trace_log_action = Server.Actions.PollTraceLog
     r.upsert_trace_action = Server.Actions.UpsertTrace
     r.index_state = Server.Models.IndexState
     r.trace_record = Server.Models.TraceRecord
     r.file_storage = Storage.Models.FileStorage
-    r.scheduler = External.Actors.Scheduler
+    r.indexer = Server.Entrypoints.Indexer
 
     with goal().keep_the(r.duckdb_index).up_to_date_with_the(r.trace_log):
-        with the(r.scheduler).triggers_the(r.poll_trace_log_action).on_an(r.interval):
+        with the(r.indexer).triggers_the(r.poll_trace_log_action).on_an(r.interval):
             with it().lists_the(r.trace_log).starting_after_the(
                 r.last_seen_key
             ).from_the(r.index_state):
@@ -41,7 +40,7 @@ markdown_node = sunya.add_markdown_node(
 )
 markdown_node.markdown = """
 The woodstock-server maintains a DuckDB index that it builds incrementally from the append-only
-trace log. A scheduler triggers a poll at a regular interval; the server fetches only the
+trace log. The indexer triggers a poll at a regular interval; the server fetches only the
 entries it has not yet seen and upserts them into the index. All file I/O goes through
 `FileStorage`, so the server works identically against S3 or a local directory.
 
@@ -71,14 +70,14 @@ and `timestamp` — without touching the tree.</br>
 
 ```mermaid
 sequenceDiagram
-    participant Scheduler
+    participant Indexer
     participant PollTraceLog as PollTraceLog (action)
     participant IndexState
     participant FileStorage
     participant UpsertTrace as UpsertTrace (action)
     participant DuckDB
 
-    Scheduler->>PollTraceLog: trigger()
+    Indexer->>PollTraceLog: trigger()
     PollTraceLog->>IndexState: read last_seen_key
     PollTraceLog->>FileStorage: list_files("traces/", start_after=last_seen_key)
     FileStorage-->>PollTraceLog: new_entries
