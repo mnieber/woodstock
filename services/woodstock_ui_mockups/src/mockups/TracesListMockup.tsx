@@ -1,55 +1,63 @@
-import { TraceStateBadge } from '../components/TraceStateBadge';
-import { RefreshButton } from '../components/RefreshButton';
+import { TraceStateBadge } from "../components/TraceStateBadge";
+import { RefreshButton } from "../components/RefreshButton";
 
 const mockTraces = [
   {
-    key: 'job-123',
-    state: 'ok' as const,
-    author: 'system',
-    timestamp: '2024-01-15T10:30:00Z',
+    key: "job-123",
+    state: "ok" as const,
+    author: "system",
+    timestamp: "2024-01-15T10:30:00Z",
     hasChildren: true,
+    isExpanded: true,
   },
   {
-    key: 'job-123/calc-456',
-    state: 'ok' as const,
-    author: 'system',
-    timestamp: '2024-01-15T10:30:05Z',
+    key: "job-123/calc-456",
+    state: "ok" as const,
+    author: "system",
+    timestamp: "2024-01-15T10:30:05Z",
     hasChildren: true,
+    isExpanded: true,
   },
   {
-    key: 'job-123/calc-456/calculation_started',
-    state: 'info' as const,
-    author: 'system',
-    timestamp: '2024-01-15T10:30:10Z',
+    key: "job-123/calc-456/calculation_started",
+    state: "ok" as const,
+    author: "system",
+    timestamp: "2024-01-15T10:30:10Z",
     hasChildren: false,
+    isExpanded: false,
   },
   {
-    key: 'job-123/calc-456/calculation_completed',
-    state: 'ok' as const,
-    author: 'system',
-    timestamp: '2024-01-15T10:32:45Z',
+    key: "job-123/calc-456/calculation_completed",
+    state: "ok" as const,
+    author: "system",
+    timestamp: "2024-01-15T10:32:45Z",
     hasChildren: false,
+    isExpanded: false,
   },
   {
-    key: 'job-124',
-    state: 'error' as const,
-    author: 'user@example.com',
-    timestamp: '2024-01-15T11:00:00Z',
+    key: "job-124",
+    state: "error" as const,
+    author: "user@example.com",
+    timestamp: "2024-01-15T11:00:00Z",
     hasChildren: true,
+    isExpanded: false, // Collapsed - children hidden
   },
+  // job-124/calc-789 and its children are NOT shown because job-124 is collapsed
   {
-    key: 'job-124/calc-789',
-    state: 'error' as const,
-    author: 'user@example.com',
-    timestamp: '2024-01-15T11:00:15Z',
+    key: "job-125",
+    state: "warn" as const,
+    author: "admin",
+    timestamp: "2024-01-15T11:15:00Z",
     hasChildren: true,
+    isExpanded: true,
   },
   {
-    key: 'job-124/calc-789/calculation_failed',
-    state: 'error' as const,
-    author: 'user@example.com',
-    timestamp: '2024-01-15T11:01:30Z',
+    key: "job-125/calc-999",
+    state: "warn" as const,
+    author: "admin",
+    timestamp: "2024-01-15T11:15:30Z",
     hasChildren: false,
+    isExpanded: false,
   },
 ];
 
@@ -87,7 +95,6 @@ export default function TracesListMockup() {
                 <option value="ok">OK</option>
                 <option value="warn">Warning</option>
                 <option value="error">Error</option>
-                <option value="info">Info</option>
               </select>
             </div>
 
@@ -127,31 +134,47 @@ export default function TracesListMockup() {
           <div className="max-w-4xl mx-auto p-6">
             <div className="bg-white rounded-lg shadow-sm border divide-y">
               {mockTraces.map((trace, index) => {
-                const depth = trace.key.split('/').length - 1;
+                const parts = trace.key.split("/");
+                const depth = parts.length - 1;
+                const displayName = parts[parts.length - 1]; // Show only the leaf part
                 return (
                   <div
                     key={index}
-                    className="p-4 hover:bg-gray-50 cursor-pointer transition-colors"
-                    style={{ paddingLeft: `${1 + depth * 1.5}rem` }}
+                    className="p-4 hover:bg-gray-50 cursor-pointer transition-colors grid grid-cols-12 gap-4 items-center"
                   >
-                    <div className="flex items-start justify-between gap-4">
-                      <div className="flex-1 min-w-0">
-                        <div className="flex items-center gap-2 mb-1">
-                          {trace.hasChildren && (
-                            <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                            </svg>
-                          )}
-                          <span className="font-mono text-sm font-medium text-gray-900">
-                            {trace.key}
-                          </span>
-                        </div>
-                        <div className="flex items-center gap-3 text-xs text-gray-500">
-                          <span>{trace.author}</span>
-                          <span>•</span>
-                          <span>{new Date(trace.timestamp).toLocaleString()}</span>
-                        </div>
-                      </div>
+                    <div
+                      className="col-span-6 flex items-center gap-2"
+                      style={{ paddingLeft: `${depth * 1.5}rem` }}
+                    >
+                      {trace.hasChildren && (
+                        <svg
+                          className={`w-4 h-4 text-gray-400 flex-shrink-0 transition-transform ${trace.isExpanded ? "rotate-90" : ""}`}
+                          fill="none"
+                          stroke="currentColor"
+                          viewBox="0 0 24 24"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={2}
+                            d="M9 5l7 7-7 7"
+                          />
+                        </svg>
+                      )}
+                      {!trace.hasChildren && (
+                        <span className="w-4 h-4 flex-shrink-0"></span>
+                      )}
+                      <span className="font-mono text-sm font-medium text-gray-900 truncate">
+                        {displayName}
+                      </span>
+                    </div>
+                    <div className="col-span-2 text-xs text-gray-500 truncate">
+                      {trace.author}
+                    </div>
+                    <div className="col-span-3 text-xs text-gray-500">
+                      {new Date(trace.timestamp).toLocaleString()}
+                    </div>
+                    <div className="col-span-1 flex justify-end">
                       <TraceStateBadge state={trace.state} />
                     </div>
                   </div>

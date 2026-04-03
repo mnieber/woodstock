@@ -237,8 +237,11 @@ State for managing the hierarchical tree view of traces. Uses Skandha for tree n
 **TraceDetailView.tsx**
 
 - View for displaying a single trace's details
-- Renders payload fields according to DSL prefix
-- Fetches and renders tree:// references
+- Organized into sections: Labels (top), Values, Links, Documents
+- Labels section shows node-specific labels at the top
+- Values section shows only `value://` fields
+- Links section shows both `link://` and `ref://` fields
+- Documents section fetches and renders `tree://` blob content
 - Uses `TraceStateProvider`
 
 **TraceTreeView.tsx**
@@ -288,10 +291,13 @@ State for managing the hierarchical tree view of traces. Uses Skandha for tree n
 
 **BlobContentView.tsx**
 
-- Renders fetched blob content
+- Renders fetched blob content in a card
+- Header shows document name as clickable link (opens raw content in new tab)
+- Header includes copy button to copy content to clipboard
 - Supports markdown rendering
 - Supports JSON formatting
 - Falls back to plain text
+- Shows tree:// path reference on the right side of header
 
 **TraceStateBadge.tsx**
 
@@ -395,11 +401,12 @@ Use a simple, clear but elegant UI style. Prioritize giving woodstock_ui a nice 
 3. Navigation to `/traces/:traceKey` occurs
 4. `SelectTraceEffect` reads URL param and selects trace
 5. `TraceDetailView` renders with `TraceStateProvider`
-6. `PayloadFieldsView` renders payload fields
-7. For each `tree://` reference, `PayloadTreeField` triggers blob fetch
-8. `useFetchBlob` queries server
-9. `BlobContentView` renders fetched content
-10. Markdown/JSON content is formatted appropriately
+6. Trace detail displays in sections: Labels (top), Values, Links, Documents
+7. For each `tree://` reference, blob content is fetched and rendered in Documents section
+8. `useFetchBlob` queries server for blob content
+9. `BlobContentView` renders fetched content (markdown, JSON, plain text)
+10. User can click document name to open raw content in new tab
+11. User can click copy button to copy document content to clipboard
 
 ### Workflow 4: Navigate via ref:// links
 
