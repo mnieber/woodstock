@@ -5,7 +5,7 @@
 ## The woodstock-server indexes new traces
 
 The woodstock-server maintains a DuckDB index that it builds incrementally from the append-only
-trace log. A scheduler triggers a poll at a regular interval; the server fetches only the
+trace log. The indexer triggers a poll at a regular interval; the server fetches only the
 entries it has not yet seen and upserts them into the index. All file I/O goes through
 `FileStorage`, so the server works identically against S3 or a local directory.
 
@@ -35,14 +35,14 @@ and `timestamp` — without touching the tree.</br>
 
 ```mermaid
 sequenceDiagram
-    participant Scheduler
+    participant Indexer
     participant PollTraceLog as PollTraceLog (action)
     participant IndexState
     participant FileStorage
     participant UpsertTrace as UpsertTrace (action)
     participant DuckDB
 
-    Scheduler->>PollTraceLog: trigger()
+    Indexer->>PollTraceLog: trigger()
     PollTraceLog->>IndexState: read last_seen_key
     PollTraceLog->>FileStorage: list_files("traces/", start_after=last_seen_key)
     FileStorage-->>PollTraceLog: new_entries

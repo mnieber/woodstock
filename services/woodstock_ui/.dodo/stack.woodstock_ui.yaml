@@ -1,0 +1,19 @@
+COMMANDS:
+  list:
+    '~install':
+      run: [in: docker, cmd: make, install]
+    '~make':
+      run: [in: docker, cmd: make]
+    '~serve':
+      run: [in: docker, cmd: make, run-server]
+    '~shell':
+      run: [in: docker, cmd: fish]
+
+DOCKER:
+  container: sunya-dev-woodstock_ui-1
+
+ROOT: {}
+
+SERVER:
+  install_dir: /app
+  src_dir: ${/SERVER/install_dir}/src

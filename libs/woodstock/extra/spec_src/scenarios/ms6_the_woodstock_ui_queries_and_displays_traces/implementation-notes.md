@@ -15,3 +15,20 @@ cross-references. Examples from the brainstorm:
 
 In all cases the destination exists in the tree but is not reachable by walking up or down from
 the current node.
+
+## Start by loading the traces and showing them as a simple list
+
+The first version of woodstock-ui should show all traces as a simple list of events, not as a tree.
+When the user clicks on a trace, we show the trace details in the right side panel.
+
+## When this works, then implement showing the trace-tree
+
+Use the roadplan ui as a reference for showing nodes that can be opened and closed.
+The order of the nodes follows the order of the events. E.g. if the trace with key jobs/hello is
+older than the trace with key jobs/goodbye, then the jobs/hello node appears before the jobs/goodbye
+node within the jobs parent node.
+
+## If the payload refers to an S3 url then the server should (on demand) try to fetch that file
+
+When the user clicks on the S3 link then the UI will ask the server to read this file from S3.
+E.g. in calcium this will allow us to inspect the inputs.json file of a calculation.
