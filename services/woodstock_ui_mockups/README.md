@@ -21,8 +21,9 @@ yarn dev
 ## Structure
 
 - `src/mockups/` - Full page mockups
-  - `TracesListMockup.tsx` - Main list view with filters and tree
-  - `TraceDetailMockup.tsx` - Detail view with payload and blobs
+  - `TracesSplitViewMockup.tsx` - **Combined view** with resizable split panel (list + detail)
+  - `TracesListMockup.tsx` - Main list view with filters and tree (standalone)
+  - `TraceDetailMockup.tsx` - Detail view with payload and blobs (standalone)
   - `ComponentShowcase.tsx` - Individual components for testing
 
 - `src/components/` - Reusable visual components
@@ -32,10 +33,12 @@ yarn dev
 
 ## Design Notes
 
-- **Color scheme**: Uses Tailwind with custom primary colors (blues) and trace state colors (green/yellow/red/blue)
-- **Layout**: Filter panel (left) + Trace list (center) + Detail panel (right/separate route)
+- **Color scheme**: Uses Tailwind with custom primary colors (blues) and trace state colors (green/yellow/red)
+- **Layout**: Filter panel (left) + Trace list (center) + Resizable splitter + Detail panel (right)
+- **Split view**: Resizable horizontal splitter, limits between 20%-80%, 50% default
 - **Typography**: Sans-serif for UI, monospace for trace keys and code
 - **Spacing**: Clean, generous spacing for readability
+- **Responsive**: Split view works best on desktop; consider stacking or tabs for mobile
 
 ## Copying to Real App
 

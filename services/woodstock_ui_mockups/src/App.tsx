@@ -1,6 +1,7 @@
 import { BrowserRouter, Routes, Route, Link } from 'react-router-dom';
 import TracesListMockup from './mockups/TracesListMockup';
 import TraceDetailMockup from './mockups/TraceDetailMockup';
+import TracesSplitViewMockup from './mockups/TracesSplitViewMockup';
 import ComponentShowcase from './mockups/ComponentShowcase';
 
 function App() {
@@ -16,13 +17,19 @@ function App() {
                   to="/"
                   className="text-sm text-gray-600 hover:text-gray-900 hover:underline"
                 >
-                  Traces List
+                  Split View
+                </Link>
+                <Link
+                  to="/list"
+                  className="text-sm text-gray-600 hover:text-gray-900 hover:underline"
+                >
+                  List Only
                 </Link>
                 <Link
                   to="/detail"
                   className="text-sm text-gray-600 hover:text-gray-900 hover:underline"
                 >
-                  Trace Detail
+                  Detail Only
                 </Link>
                 <Link
                   to="/components"
@@ -36,7 +43,8 @@ function App() {
         </nav>
 
         <Routes>
-          <Route path="/" element={<TracesListMockup />} />
+          <Route path="/" element={<TracesSplitViewMockup />} />
+          <Route path="/list" element={<TracesListMockup />} />
           <Route path="/detail" element={<TraceDetailMockup />} />
           <Route path="/components" element={<ComponentShowcase />} />
         </Routes>
