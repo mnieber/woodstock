@@ -38,7 +38,10 @@ yarn dev
 - **Split view**: Resizable horizontal splitter, limits between 20%-80%, 50% default
 - **Typography**: Sans-serif for UI, monospace for trace keys and code
 - **Spacing**: Clean, generous spacing for readability
-- **Responsive**: Split view works best on desktop; consider stacking or tabs for mobile
+- **Responsive**:
+  - Desktop (≥1024px): Full split view
+  - Below 1024px: List only, clicking trace opens detail in new tab
+  - Real app should use `react-resize-detector` for better performance
 
 ## Copying to Real App
 
