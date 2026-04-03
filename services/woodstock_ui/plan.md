@@ -167,18 +167,18 @@ The state container for a single trace detail view.
 
 ### TraceTreeState (in `traces/TraceTreeState/`)
 
-State for managing the hierarchical tree view of traces.
+State for managing the hierarchical tree view of traces. Uses Skandha for tree node management.
 
 **Files:**
 
 - `TraceTreeState.ts` — Main state class
-- `NodesData.ts` — Facet for tree nodes
+- `NodesData.ts` — Facet for tree nodes (using Skandha)
 - `Expansion.ts` — Facet for expanded/collapsed state
 - `registerTraceTreeCtr.ts` — Wiring
 
 **Facets:**
 
-- `nodes` — Tree node hierarchy derived from trace keys
+- `nodes` — Tree node hierarchy derived from trace keys (managed via Skandha)
 - `expansion` — Tracks which nodes are expanded/collapsed
 
 **Props:**
@@ -230,6 +230,7 @@ State for managing the hierarchical tree view of traces.
 
 - Top-level view for the traces list route
 - Renders filter controls and trace list
+- Includes refresh button in top ribbon
 - Uses `TracesStateProvider`
 - Layout: filter panel on left, trace list in center, detail panel on right
 
@@ -303,6 +304,12 @@ State for managing the hierarchical tree view of traces.
 - Shows label key-value pairs
 - May highlight active/special labels
 
+**RefreshButton.tsx**
+
+- Button in top ribbon to refresh trace data
+- Triggers re-query of traces from server
+- Shows loading state during refresh
+
 ### Effects
 
 **SelectTraceEffect.tsx**
@@ -366,10 +373,11 @@ Use a simple, clear but elegant UI style. Prioritize giving woodstock_ui a nice 
 1. User navigates to `/traces`
 2. `TracesListView` renders with `TracesStateProvider`
 3. `TracesState` initializes with empty filter
-4. `useQueryTraces` fetches all traces from server
-5. User enters filter criteria in `TraceFilterForm`
-6. Filter facet updates, triggering re-query
-7. Trace list updates to show filtered results
+4. `useQueryTraces` fetches all traces from server (no pagination, loads all)
+5. User can click refresh button in top ribbon to re-fetch traces
+6. User enters filter criteria in `TraceFilterForm` (prefix, state, author, time range - not labels)
+7. Filter facet updates, triggering re-query
+8. Trace list updates to show filtered results
 
 ### Workflow 2: View trace hierarchy
 
@@ -457,19 +465,22 @@ Use a simple, clear but elegant UI style. Prioritize giving woodstock_ui a nice 
 
 ### Phase 5: Filtering
 
-**Goal:** Let users filter traces by prefix, state, author, time range.
+**Goal:** Let users filter traces by prefix, state, author, time range. Note: Label-based filtering is not included in this phase.
 
 - [ ] State: Add filter facet to `TracesState`
-- [ ] Component: `TraceFilterForm`
+- [ ] Component: `TraceFilterForm` with fields for prefix, state, author, time range
 - [ ] Utility: `formatTimestamp` for date range pickers
 - [ ] Update URL to include filter params
 - [ ] Persist filter state in URL
+- [ ] Component: `RefreshButton` in top ribbon to manually refresh traces
 
 ## Key Design Decisions
 
 ### Use existing treeview component vs. create new one
 
-**Decision:** Use the `treeview/` component from roadplan_ui as inspiration for a brand new tree view in woodstock_ui. The tree in woodstock_ui uses skandha.
+**Decision:** Use the `treeview/` component from roadplan_ui as inspiration for a brand new tree view in woodstock_ui. The tree in woodstock_ui uses Skandha for tree node management.
+
+**Rationale:** Skandha provides efficient tree state management and is the established pattern from roadplan_ui.
 
 ### Trace key URL encoding
 
