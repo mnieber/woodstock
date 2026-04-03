@@ -2,7 +2,7 @@ services:
   woodstock-indexer:
     build:
       context: ${ROOT_DIR}
-      dockerfile: services/woodstock-indexer/Dockerfile.local
+      dockerfile: services/woodstock_indexer/Dockerfile.local
     depends_on:
       localstack: {condition: service_healthy}
     env_file:
@@ -14,7 +14,7 @@ services:
   woodstock-server:
     build:
       context: ${ROOT_DIR}
-      dockerfile: services/woodstock-server/Dockerfile.local
+      dockerfile: services/woodstock_server/Dockerfile.local
     depends_on:
       localstack: {condition: service_healthy}
     env_file:
