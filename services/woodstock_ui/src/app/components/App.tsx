@@ -1,43 +1,20 @@
-import { NodesStateProvider } from '/src/treeview/components/NodesStateProvider';
 import { QueryClientProvider } from '@tanstack/react-query';
 import React from 'react';
 import * as R from 'ramda';
 import { queryClient } from '/src/api/queryClient';
-import { AuthStateProvider } from '/src/auth/components/AuthStateProvider';
-import { AuthSwitch } from '/src/auth/components/AuthSwitch';
-import { AtlasStateProvider } from '/src/atlases/components/AtlasStateProvider';
-import { AtlasesStateProvider } from '/src/atlases/components/AtlasesStateProvider';
-import { MainSwitch } from '/src/frames/components/MainSwitch';
-import { DashboardFrame } from '/src/frames/components/DashboardFrame';
-import { MainView } from '/src/frames/components/MainView';
 import { L } from '/src/frames/layout';
-import { NavStateProvider } from '/src/routes/components/NavStateProvider';
 import { cn } from '/src/utils/classnames';
-import { AppStateProvider } from '/src/app/components/AppStateProvider';
+import { TracesStateProvider } from '/src/traces/components/TracesStateProvider';
+import { TracesSwitch } from '/src/traces/components/TracesSwitch';
 
 export const App = () => {
   return (
     <QueryClientProvider client={queryClient}>
-      <AuthStateProvider>
-        <NavStateProvider>
-          <AppStateProvider>
-            <AppBody>
-              <DashboardFrame>
-                <AuthSwitch />
-                <AtlasesStateProvider>
-                  <AtlasStateProvider>
-                    <NodesStateProvider>
-                      <MainView className="">
-                        <MainSwitch />
-                      </MainView>
-                    </NodesStateProvider>
-                  </AtlasStateProvider>
-                </AtlasesStateProvider>
-              </DashboardFrame>
-            </AppBody>
-          </AppStateProvider>
-        </NavStateProvider>
-      </AuthStateProvider>
+      <AppBody>
+        <TracesStateProvider>
+          <TracesSwitch />
+        </TracesStateProvider>
+      </AppBody>
     </QueryClientProvider>
   );
 };
