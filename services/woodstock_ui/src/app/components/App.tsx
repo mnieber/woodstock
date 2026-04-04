@@ -6,12 +6,14 @@ import { L } from '/src/frames/layout';
 import { cn } from '/src/utils/classnames';
 import { TracesStateProvider } from '/src/traces/components/TracesStateProvider';
 import { TracesSwitch } from '/src/traces/components/TracesSwitch';
+import { ScreenPropertiesEffect } from '/src/app/components/ScreenPropertiesEffect';
 
 export const App = () => {
   return (
     <QueryClientProvider client={queryClient}>
       <AppBody>
         <TracesStateProvider>
+          <ScreenPropertiesEffect />
           <TracesSwitch />
         </TracesStateProvider>
       </AppBody>

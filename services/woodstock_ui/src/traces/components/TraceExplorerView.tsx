@@ -3,7 +3,6 @@ import { Panel, PanelGroup, PanelResizeHandle } from 'react-resizable-panels';
 import { withContextProps } from 'react-props-from-context';
 import { Route } from 'wouter';
 import { appCtx } from '/src/app/hooks/useAppContext';
-import { SelectTraceEffect } from '/src/traces/components/SelectTraceEffect';
 import { TraceDetailView } from '/src/traces/components/TraceDetailView';
 import { TraceListItems } from '/src/traces/components/TraceListItems';
 import { tracesRoutes } from '/src/traces/routes';
@@ -17,15 +16,13 @@ const ContextProps = {
   appState: appCtx.appState,
 };
 
-export const TracesListView = observer(
+export const TraceExplorerView = observer(
   withContextProps((props: PropsT & typeof ContextProps) => {
     const isDesktop = props.appState.isDesktop;
 
     return (
-      <>
-        <SelectTraceEffect />
-        <div className={cn('TracesListView h-full', props.className)}>
-          {isDesktop ? (
+      <div className={cn('TraceExplorerView h-full', props.className)}>
+        {isDesktop ? (
           // Desktop: Split view with resizable panels
           <PanelGroup direction="horizontal">
             <Panel defaultSize={40} minSize={30}>
@@ -51,8 +48,7 @@ export const TracesListView = observer(
             </Route>
           </div>
         )}
-        </div>
-      </>
+      </div>
     );
   }, ContextProps)
 );

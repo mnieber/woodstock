@@ -1,23 +1,22 @@
 import { observer } from 'mobx-react-lite';
 import { Route, Switch } from 'wouter';
-import { ScreenPropertiesEffect } from '/src/app/components/ScreenPropertiesEffect';
-import { TracesListView } from '/src/traces/components/TracesListView';
+import { TraceExplorerView } from '/src/traces/components/TraceExplorerView';
+import { TraceDetailView } from '/src/traces/components/TraceDetailView';
 import { tracesRoutes } from '/src/traces/routes';
+import { SelectTraceEffect } from '/src/traces/components/SelectTraceEffect';
 
 type PropsT = {};
 
 export const TracesSwitch = observer((props: PropsT) => {
   return (
-    <>
-      <ScreenPropertiesEffect />
-      <Switch>
-        <Route path={tracesRoutes.traces()}>
-          <TracesListView />
-        </Route>
-        <Route path={tracesRoutes.traceDetail()}>
-          <TracesListView />
-        </Route>
-      </Switch>
-    </>
+    <Switch>
+      <Route path={tracesRoutes.traces()}>
+        <TraceExplorerView />
+      </Route>
+      <Route path={tracesRoutes.traceDetail()}>
+        <SelectTraceEffect />
+        <TraceDetailView />
+      </Route>
+    </Switch>
   );
 });
