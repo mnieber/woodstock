@@ -25,5 +25,8 @@ export const tracesCtx = R.mergeAll([
     selectTrace: [useTracesContext, 'selectTrace'] as any as (traceKey: string) => void,
     tracesSelection: [useTracesContext, 'tracesSelection'] as any as Selection,
     viewMode: [useTracesContext, 'viewMode'] as any as any,
+    filter: [useTracesContext, 'filter'] as any as any,
+    applyFilter: [useTracesContext, 'applyFilter'] as any as () => void,
+    queryTraces: [useTracesContext, 'queryTraces'] as any as any,
   },
 ]);

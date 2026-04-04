@@ -11,7 +11,10 @@ import { useBuilder } from '/src/utils/hooks/useBuilder';
 export type PropsT = React.PropsWithChildren<{}>;
 
 export const TracesStateProvider = observer((props: PropsT) => {
-  const { tracesState, queryTraces } = useTracesState({});
+  // Create a memoized filter object that updates when filter facet changes
+  const [filterForQuery, setFilterForQuery] = React.useState({});
+
+  const { tracesState, queryTraces } = useTracesState({ filter: filterForQuery });
 
   const cache = useBuilder(() =>
     makeAutoObservable({
@@ -51,6 +54,11 @@ export const TracesStateProvider = observer((props: PropsT) => {
       },
       tracesSelection: () => tracesState.tracesCtr.selection,
       viewMode: () => tracesState.tracesCtr.viewMode,
+      filter: () => tracesState.tracesCtr.filter,
+      applyFilter: () => {
+        setFilterForQuery(tracesState.tracesCtr.filter.asFilterObject);
+      },
+      queryTraces: () => queryTraces,
     });
   };
 
