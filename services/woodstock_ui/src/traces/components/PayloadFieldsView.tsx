@@ -3,6 +3,7 @@ import { TraceRecordT } from '/src/api/types/TraceRecordT';
 import { PayloadValueField } from '/src/traces/components/PayloadValueField';
 import { PayloadLinkField } from '/src/traces/components/PayloadLinkField';
 import { PayloadRefField } from '/src/traces/components/PayloadRefField';
+import { PayloadTreeField } from '/src/traces/components/PayloadTreeField';
 import { parsePayloadField } from '/src/traces/utils/parsePayloadField';
 
 export type PropsT = {
@@ -37,12 +38,7 @@ export const PayloadFieldsView: React.FC<PropsT> = (props: PropsT) => {
         }
 
         if (parsed.type === 'tree') {
-          // tree:// fields will be implemented in Phase 3
-          return (
-            <div key={key} className="text-sm text-gray-400">
-              {key}: {value} (tree:// - Phase 3)
-            </div>
-          );
+          return <PayloadTreeField key={key} fieldKey={key} treePath={parsed.content} />;
         }
 
         return null;

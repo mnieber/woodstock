@@ -1,8 +1,9 @@
 import { http, HttpResponse } from 'msw';
 import { hostUrl } from '/src/api/restClient';
+import { fetchBlobUrl } from '/src/api/queries/useFetchBlob';
+import { convertDataToSnakeCase } from '/src/api/utils/convertDataToSnakeCase';
+import { BlobContentSchema } from '/src/api/types/BlobContentSchema';
 import { joinUrls } from '/src/utils/urls';
-
-export const fetchBlobUrl = '/fetch-blob';
 
 // Mock blob content based on tree paths
 const mockBlobs: { [path: string]: string } = {
@@ -44,11 +45,11 @@ export const handleFetchBlob = http.get(
       return new HttpResponse(`Blob not found: ${treePath}`, { status: 404 });
     }
 
-    return new HttpResponse(content, {
-      status: 200,
-      headers: {
-        'Content-Type': 'application/octet-stream',
-      },
-    });
+    return HttpResponse.json(
+      convertDataToSnakeCase(BlobContentSchema, {
+        path: treePath,
+        content: content,
+      })
+    );
   }
 );
