@@ -1,7 +1,8 @@
 import { observer } from 'mobx-react-lite';
-import React from 'react';
 import { Panel, PanelGroup, PanelResizeHandle } from 'react-resizable-panels';
+import { withContextProps } from 'react-props-from-context';
 import { Route } from 'wouter';
+import { appCtx } from '/src/app/hooks/useAppContext';
 import { SelectTraceEffect } from '/src/traces/components/SelectTraceEffect';
 import { TraceDetailView } from '/src/traces/components/TraceDetailView';
 import { TraceListItems } from '/src/traces/components/TraceListItems';
@@ -12,31 +13,19 @@ export type PropsT = {
   className?: any;
 };
 
-export const TracesListView = observer((props: PropsT) => {
-  const [isDesktop, setIsDesktop] = React.useState(
-    window.matchMedia('(min-width: 1024px)').matches
-  );
+const ContextProps = {
+  appState: appCtx.appState,
+};
 
-  React.useEffect(() => {
-    const mediaQuery = window.matchMedia('(min-width: 1024px)');
-    const handler = (e: MediaQueryListEvent) => setIsDesktop(e.matches);
+export const TracesListView = observer(
+  withContextProps((props: PropsT & typeof ContextProps) => {
+    const isDesktop = props.appState.isDesktop;
 
-    // Modern browsers
-    if (mediaQuery.addEventListener) {
-      mediaQuery.addEventListener('change', handler);
-      return () => mediaQuery.removeEventListener('change', handler);
-    } else {
-      // Fallback for older browsers
-      mediaQuery.addListener(handler);
-      return () => mediaQuery.removeListener(handler);
-    }
-  }, []);
-
-  return (
-    <>
-      <SelectTraceEffect />
-      <div className={cn('TracesListView h-full', props.className)}>
-        {isDesktop ? (
+    return (
+      <>
+        <SelectTraceEffect />
+        <div className={cn('TracesListView h-full', props.className)}>
+          {isDesktop ? (
           // Desktop: Split view with resizable panels
           <PanelGroup direction="horizontal">
             <Panel defaultSize={40} minSize={30}>
@@ -62,7 +51,8 @@ export const TracesListView = observer((props: PropsT) => {
             </Route>
           </div>
         )}
-      </div>
-    </>
-  );
-});
+        </div>
+      </>
+    );
+  }, ContextProps)
+);
