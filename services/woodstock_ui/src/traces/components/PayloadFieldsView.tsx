@@ -1,30 +1,13 @@
 import React from 'react';
 import { TraceRecordT } from '/src/api/types/TraceRecordT';
 import { PayloadValueField } from '/src/traces/components/PayloadValueField';
+import { PayloadLinkField } from '/src/traces/components/PayloadLinkField';
+import { PayloadRefField } from '/src/traces/components/PayloadRefField';
+import { parsePayloadField } from '/src/traces/utils/parsePayloadField';
 
 export type PropsT = {
   trace: TraceRecordT;
   className?: any;
-};
-
-type PayloadFieldType = 'value' | 'link' | 'ref' | 'tree';
-
-const parsePayloadField = (
-  value: string
-): { type: PayloadFieldType; content: string } => {
-  if (value.startsWith('value://')) {
-    return { type: 'value', content: value.substring('value://'.length) };
-  }
-  if (value.startsWith('link://')) {
-    return { type: 'link', content: value.substring('link://'.length) };
-  }
-  if (value.startsWith('ref://')) {
-    return { type: 'ref', content: value.substring('ref://'.length) };
-  }
-  if (value.startsWith('tree://')) {
-    return { type: 'tree', content: value.substring('tree://'.length) };
-  }
-  return { type: 'value', content: value };
 };
 
 export const PayloadFieldsView: React.FC<PropsT> = (props: PropsT) => {
@@ -41,17 +24,28 @@ export const PayloadFieldsView: React.FC<PropsT> = (props: PropsT) => {
       {payloadEntries.map(([key, value]) => {
         const parsed = parsePayloadField(value);
 
-        // For Phase 1, only render value:// fields
         if (parsed.type === 'value') {
           return <PayloadValueField key={key} fieldKey={key} value={parsed.content} />;
         }
 
-        // For other types, show placeholder
-        return (
-          <div key={key} className="text-sm text-gray-400">
-            {key}: {value} (type: {parsed.type} - not yet implemented)
-          </div>
-        );
+        if (parsed.type === 'link') {
+          return <PayloadLinkField key={key} fieldKey={key} url={parsed.content} />;
+        }
+
+        if (parsed.type === 'ref') {
+          return <PayloadRefField key={key} fieldKey={key} traceKey={parsed.content} />;
+        }
+
+        if (parsed.type === 'tree') {
+          // tree:// fields will be implemented in Phase 3
+          return (
+            <div key={key} className="text-sm text-gray-400">
+              {key}: {value} (tree:// - Phase 3)
+            </div>
+          );
+        }
+
+        return null;
       })}
     </div>
   );
