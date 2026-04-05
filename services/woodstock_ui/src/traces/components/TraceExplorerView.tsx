@@ -69,7 +69,7 @@ export const TraceExplorerView = observer(
           ) : (
             // Mobile: List only, detail opens in new route
             <div className="flex-1 overflow-y-auto">
-              <Route path={tracesRoutes.traceDetail()}>
+              <Route path={tracesRoutes.trace()}>
                 <TraceDetailView />
               </Route>
               <Route path={tracesRoutes.traces()}>

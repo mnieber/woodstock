@@ -4,15 +4,15 @@ import { generatePath } from '/src/routes/utils/generatePath';
 
 export const tracesRoutes = {
   traces: () => '/traces',
-  traceDetail: () => '/traces/*',
+  trace: () => '/traces/*',
 };
 
 export class TracesNav {
   traces(params: {}, callerId?: string): RouteSpecT {
     return navHandler().run('traces', params, callerId);
   }
-  traceDetail(params: { traceKey: string }, callerId?: string): RouteSpecT {
-    return navHandler().run('traceDetail', params, callerId);
+  trace(params: { traceKey: string }, callerId?: string): RouteSpecT {
+    return navHandler().run('trace', params, callerId);
   }
 }
 
@@ -24,7 +24,7 @@ export class DefaultTracesNavHandler extends TracesNav {
     };
   }
 
-  traceDetail(params: { traceKey: string }, callerId?: string) {
+  trace(params: { traceKey: string }, callerId?: string) {
     return {
       url: `/traces/${params.traceKey}`,
       nav: history.push,

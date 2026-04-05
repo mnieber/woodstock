@@ -10,7 +10,7 @@ export type PropsT = {
 export const PayloadRefField: React.FC<PropsT> = (props: PropsT) => {
   const handleClick = (e: React.MouseEvent) => {
     e.preventDefault();
-    const routeSpec = tracesNav.traceDetail({ traceKey: props.traceKey });
+    const routeSpec = tracesNav.trace({ traceKey: props.traceKey });
     routeSpec.nav(routeSpec.url);
   };
 

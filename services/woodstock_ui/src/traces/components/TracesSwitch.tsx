@@ -13,7 +13,7 @@ export const TracesSwitch = observer((props: PropsT) => {
       <Route path={tracesRoutes.traces()}>
         <TraceExplorerView />
       </Route>
-      <Route path={tracesRoutes.traceDetail()}>
+      <Route path={tracesRoutes.trace()}>
         <SelectTraceEffect />
         <TraceDetailView />
       </Route>

@@ -25,7 +25,7 @@ export const TraceListItems = observer(
     }
 
     const traceDivs = props.traces.map((trace: TraceRecordT) => {
-      const url = tracesNav.traceDetail({ traceKey: trace.traceKey }).url;
+      const url = tracesNav.trace({ traceKey: trace.traceKey }).url;
       return (
         <TraceListItem
           key={trace.traceKey}
@@ -45,9 +45,7 @@ export const TraceListItems = observer(
         className={cn('TraceListItems', ['p-6', props.className])}
         tabIndex={1}
       >
-        <div className="bg-white rounded-lg shadow-sm border">
-          {traceDivs}
-        </div>
+        <div className="bg-white rounded-lg shadow-sm border">{traceDivs}</div>
       </div>
     );
   }, ContextProps)
