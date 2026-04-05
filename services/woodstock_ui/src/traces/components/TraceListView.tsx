@@ -18,10 +18,10 @@ const ContextProps = {
   tracesSelection: tracesCtx.tracesSelection,
 };
 
-export const TraceListItems = observer(
+export const TraceListView = observer(
   withContextProps((props: PropsT & typeof ContextProps) => {
     if (isLoading(props.traces)) {
-      return <TraceListItemsLoader className="text-gray-text" />;
+      return <TraceListViewLoader className="text-gray-text" />;
     }
 
     const traceDivs = props.traces.map((trace: TraceRecordT) => {
@@ -30,7 +30,7 @@ export const TraceListItems = observer(
         <TraceListItem
           key={trace.traceKey}
           className={{
-            'TraceListItem--selected': props.tracesSelection.itemIds.includes(
+            'bg-gray-100': props.tracesSelection.itemIds.includes(
               trace.traceKey
             ),
           }}
@@ -42,7 +42,7 @@ export const TraceListItems = observer(
 
     return (
       <div
-        className={cn('TraceListItems', ['p-6', props.className])}
+        className={cn('TraceListView', ['p-6', props.className])}
         tabIndex={1}
       >
         <div className="bg-white rounded-lg shadow-sm border">{traceDivs}</div>
@@ -51,14 +51,14 @@ export const TraceListItems = observer(
   }, ContextProps)
 );
 
-export const TraceListItemsLoader = (props: { className?: any }) => {
+export const TraceListViewLoader = (props: { className?: any }) => {
   const loaderBars = ['1', '2', '3'].map((id: string) => {
     return <LoaderBar key={`item-${id}`} className={cn('my-1 h-6')} />;
   });
 
   return (
     <div
-      className={cn('TraceListItemsLoader', [
+      className={cn('TraceListViewLoader', [
         L.col.banner(),
         'min-w-[50px]',
         props.className,

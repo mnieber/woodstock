@@ -4,7 +4,7 @@ import { withContextProps } from 'react-props-from-context';
 import { Route } from 'wouter';
 import { appCtx } from '/src/app/hooks/useAppContext';
 import { TraceDetailView } from '/src/traces/components/TraceDetailView';
-import { TraceListItems } from '/src/traces/components/TraceListItems';
+import { TraceListView } from '/src/traces/components/TraceListView';
 import { TraceTreeView } from '/src/traces/components/TraceTreeView';
 import { TraceFilterForm } from '/src/traces/components/TraceFilterForm';
 import { TopRibbon } from '/src/traces/components/TopRibbon';
@@ -28,7 +28,7 @@ export const TraceExplorerView = observer(
     const viewMode = props.viewMode.mode;
 
     const ListView =
-      viewMode === 'list' ? <TraceListItems /> : <TraceTreeView />;
+      viewMode === 'list' ? <TraceListView /> : <TraceTreeView />;
 
     return (
       <div
