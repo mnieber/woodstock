@@ -8,16 +8,19 @@ import { TracesStateProvider } from '/src/traces/components/TracesStateProvider'
 import { TracesSwitch } from '/src/traces/components/TracesSwitch';
 import { ScreenPropertiesEffect } from '/src/app/components/ScreenPropertiesEffect';
 import { AppStateProvider } from '/src/app/components/AppStateProvider';
+import { TraceTreeStateProvider } from '/src/traces/components/TraceTreeStateProvider';
 
 export const App = () => {
   return (
     <QueryClientProvider client={queryClient}>
       <AppStateProvider>
         <TracesStateProvider>
-          <AppBody>
-            <ScreenPropertiesEffect />
-            <TracesSwitch />
-          </AppBody>
+          <TraceTreeStateProvider>
+            <AppBody>
+              <ScreenPropertiesEffect />
+              <TracesSwitch />
+            </AppBody>
+          </TraceTreeStateProvider>
         </TracesStateProvider>
       </AppStateProvider>
     </QueryClientProvider>

@@ -6,7 +6,6 @@ import { appCtx } from '/src/app/hooks/useAppContext';
 import { TraceDetailView } from '/src/traces/components/TraceDetailView';
 import { TraceListItems } from '/src/traces/components/TraceListItems';
 import { TraceTreeView } from '/src/traces/components/TraceTreeView';
-import { TraceTreeStateProvider } from '/src/traces/components/TraceTreeStateProvider';
 import { TraceFilterForm } from '/src/traces/components/TraceFilterForm';
 import { RefreshButton } from '/src/traces/components/RefreshButton';
 import { tracesCtx } from '/src/traces/hooks/useTracesContext';
@@ -63,14 +62,16 @@ export const TraceExplorerView = observer(
       </div>
     );
 
-    const ListView = viewMode === 'list' ? <TraceListItems /> : (
-      <TraceTreeStateProvider>
-        <TraceTreeView />
-      </TraceTreeStateProvider>
-    );
+    const ListView =
+      viewMode === 'list' ? <TraceListItems /> : <TraceTreeView />;
 
     return (
-      <div className={cn('TraceExplorerView h-full flex flex-col', props.className)}>
+      <div
+        className={cn(
+          'TraceExplorerView h-full flex flex-col',
+          props.className
+        )}
+      >
         <TopRibbon />
         <div className="flex-1 flex overflow-hidden">
           {isDesktop ? (
@@ -88,9 +89,7 @@ export const TraceExplorerView = observer(
               <Panel defaultSize={35} minSize={25}>
                 <div className="h-full flex flex-col border-r border-gray-200">
                   <ViewToggle />
-                  <div className="flex-1 overflow-y-auto">
-                    {ListView}
-                  </div>
+                  <div className="flex-1 overflow-y-auto">{ListView}</div>
                 </div>
               </Panel>
               <PanelResizeHandle className="w-1 bg-gray-200 hover:bg-gray-300 transition-colors" />
@@ -111,9 +110,7 @@ export const TraceExplorerView = observer(
               <Route path={tracesRoutes.traces()}>
                 <div className="h-full flex flex-col">
                   <ViewToggle />
-                  <div className="flex-1 overflow-y-auto">
-                    {ListView}
-                  </div>
+                  <div className="flex-1 overflow-y-auto">{ListView}</div>
                 </div>
               </Route>
             </div>
