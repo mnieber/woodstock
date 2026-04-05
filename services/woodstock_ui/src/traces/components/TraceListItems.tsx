@@ -42,10 +42,12 @@ export const TraceListItems = observer(
 
     return (
       <div
-        className={cn('TraceListItems', [L.col.banner(), 'p-4', props.className])}
+        className={cn('TraceListItems', ['p-6', props.className])}
         tabIndex={1}
       >
-        {traceDivs}
+        <div className="bg-white rounded-lg shadow-sm border">
+          {traceDivs}
+        </div>
       </div>
     );
   }, ContextProps)

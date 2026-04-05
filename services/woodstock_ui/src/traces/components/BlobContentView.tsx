@@ -21,7 +21,7 @@ const isMarkdownContent = (path: string): boolean => {
 };
 
 export const BlobContentView: React.FC<PropsT> = (props: PropsT) => {
-  const [copied, setCopied] = useState(false);
+  const [_, setCopied] = useState(false);
 
   const handleCopy = () => {
     navigator.clipboard.writeText(props.blob.content);
@@ -45,7 +45,11 @@ export const BlobContentView: React.FC<PropsT> = (props: PropsT) => {
 
   if (isJsonContent(props.blob.content)) {
     try {
-      formattedContent = JSON.stringify(JSON.parse(props.blob.content), null, 2);
+      formattedContent = JSON.stringify(
+        JSON.parse(props.blob.content),
+        null,
+        2
+      );
       contentType = 'json';
     } catch {
       // Fall back to plain text
@@ -55,44 +59,75 @@ export const BlobContentView: React.FC<PropsT> = (props: PropsT) => {
   }
 
   return (
-    <div className={cn('BlobContentView border rounded-lg overflow-hidden', props.className)}>
+    <div
+      className={cn(
+        'BlobContentView bg-white rounded-lg border shadow-sm overflow-hidden',
+        props.className
+      )}
+    >
       {/* Header */}
-      <div className="bg-gray-100 border-b px-4 py-2 flex items-center justify-between">
-        <div className="flex items-center gap-3 flex-1 min-w-0">
+      <div className="bg-gray-50 px-4 py-2 border-b flex items-center justify-between">
+        <div className="flex items-center gap-2">
           <button
             onClick={handleOpenRaw}
-            className="text-blue-600 hover:text-blue-800 font-medium text-sm truncate"
-            title={filename}
+            className="text-sm font-medium text-primary-600 hover:text-primary-700 hover:underline font-mono inline-flex items-center gap-1"
+            title={`Open ${filename} in new tab`}
           >
             {filename}
+            <svg
+              className="w-3 h-3"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"
+              />
+            </svg>
           </button>
-          <span className="text-xs text-gray-500 truncate">{props.blob.path}</span>
+          <button
+            onClick={handleCopy}
+            className="p-1 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded transition-colors"
+            title="Copy to clipboard"
+          >
+            <svg
+              className="w-4 h-4"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"
+              />
+            </svg>
+          </button>
         </div>
-        <button
-          onClick={handleCopy}
-          className="ml-3 px-3 py-1 text-xs bg-white border border-gray-300 rounded hover:bg-gray-50 transition-colors flex-shrink-0"
-        >
-          {copied ? 'Copied!' : 'Copy'}
-        </button>
+        <span className="text-xs text-gray-500">{`tree://${props.blob.path}`}</span>
       </div>
 
       {/* Content */}
-      <div className="p-4 bg-white">
+      <div className="p-4">
         {contentType === 'json' && (
-          <pre className="text-xs font-mono text-gray-800 overflow-x-auto">
-            {formattedContent}
+          <pre className="text-xs overflow-x-auto">
+            <code className="text-gray-800">{formattedContent}</code>
           </pre>
         )}
         {contentType === 'markdown' && (
           <div className="prose prose-sm max-w-none">
-            <pre className="text-xs font-mono text-gray-800 overflow-x-auto whitespace-pre-wrap">
-              {formattedContent}
+            <pre className="text-xs overflow-x-auto whitespace-pre-wrap">
+              <code className="text-gray-800">{formattedContent}</code>
             </pre>
           </div>
         )}
         {contentType === 'plain' && (
-          <pre className="text-xs font-mono text-gray-800 overflow-x-auto whitespace-pre-wrap">
-            {formattedContent}
+          <pre className="text-xs overflow-x-auto whitespace-pre-wrap">
+            <code className="text-gray-800">{formattedContent}</code>
           </pre>
         )}
       </div>

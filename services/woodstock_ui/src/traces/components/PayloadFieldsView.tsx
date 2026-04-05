@@ -20,29 +20,65 @@ export const PayloadFieldsView: React.FC<PropsT> = (props: PropsT) => {
     );
   }
 
+  // Group fields by type
+  const valueFields: Array<[string, any]> = [];
+  const linkFields: Array<[string, any]> = [];
+  const refFields: Array<[string, any]> = [];
+  const treeFields: Array<[string, any]> = [];
+
+  payloadEntries.forEach(([key, value]) => {
+    const parsed = parsePayloadField(value);
+    if (parsed.type === 'value') {
+      valueFields.push([key, parsed.content]);
+    } else if (parsed.type === 'link') {
+      linkFields.push([key, parsed.content]);
+    } else if (parsed.type === 'ref') {
+      refFields.push([key, parsed.content]);
+    } else if (parsed.type === 'tree') {
+      treeFields.push([key, parsed.content]);
+    }
+  });
+
   return (
-    <div className="PayloadFieldsView space-y-2">
-      {payloadEntries.map(([key, value]) => {
-        const parsed = parsePayloadField(value);
+    <div className="PayloadFieldsView space-y-6">
+      {/* Values Section */}
+      {valueFields.length > 0 && (
+        <section>
+          <h2 className="text-lg font-semibold text-gray-900 mb-3">Values</h2>
+          <div className="bg-white rounded-lg border shadow-sm p-6 space-y-1">
+            {valueFields.map(([key, value]) => (
+              <PayloadValueField key={key} fieldKey={key} value={value} />
+            ))}
+          </div>
+        </section>
+      )}
 
-        if (parsed.type === 'value') {
-          return <PayloadValueField key={key} fieldKey={key} value={parsed.content} />;
-        }
+      {/* Links Section */}
+      {(linkFields.length > 0 || refFields.length > 0) && (
+        <section>
+          <h2 className="text-lg font-semibold text-gray-900 mb-3">Links</h2>
+          <div className="bg-white rounded-lg border shadow-sm p-6 space-y-1">
+            {linkFields.map(([key, url]) => (
+              <PayloadLinkField key={key} fieldKey={key} url={url} />
+            ))}
+            {refFields.map(([key, traceKey]) => (
+              <PayloadRefField key={key} fieldKey={key} traceKey={traceKey} />
+            ))}
+          </div>
+        </section>
+      )}
 
-        if (parsed.type === 'link') {
-          return <PayloadLinkField key={key} fieldKey={key} url={parsed.content} />;
-        }
-
-        if (parsed.type === 'ref') {
-          return <PayloadRefField key={key} fieldKey={key} traceKey={parsed.content} />;
-        }
-
-        if (parsed.type === 'tree') {
-          return <PayloadTreeField key={key} fieldKey={key} treePath={parsed.content} />;
-        }
-
-        return null;
-      })}
+      {/* Documents Section */}
+      {treeFields.length > 0 && (
+        <section>
+          <h2 className="text-lg font-semibold text-gray-900 mb-3">Documents</h2>
+          <div className="space-y-4">
+            {treeFields.map(([key, treePath]) => (
+              <PayloadTreeField key={key} fieldKey={key} treePath={treePath} />
+            ))}
+          </div>
+        </section>
+      )}
     </div>
   );
 };
