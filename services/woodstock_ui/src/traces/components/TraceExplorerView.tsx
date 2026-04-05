@@ -7,7 +7,8 @@ import { TraceDetailView } from '/src/traces/components/TraceDetailView';
 import { TraceListItems } from '/src/traces/components/TraceListItems';
 import { TraceTreeView } from '/src/traces/components/TraceTreeView';
 import { TraceFilterForm } from '/src/traces/components/TraceFilterForm';
-import { RefreshButton } from '/src/traces/components/RefreshButton';
+import { TopRibbon } from '/src/traces/components/TopRibbon';
+import { ViewToggle } from '/src/traces/components/ViewToggle';
 import { tracesCtx } from '/src/traces/hooks/useTracesContext';
 import { tracesRoutes } from '/src/traces/routes';
 import { cn } from '/src/utils/classnames';
@@ -25,42 +26,6 @@ export const TraceExplorerView = observer(
   withContextProps((props: PropsT & typeof ContextProps) => {
     const isDesktop = props.appState.isDesktop;
     const viewMode = props.viewMode.mode;
-
-    // Top ribbon with refresh button
-    const TopRibbon = () => (
-      <div className="flex items-center justify-between gap-2 px-4 py-2 border-b border-gray-200 bg-gray-50">
-        <h2 className="text-sm font-semibold text-gray-700">Traces</h2>
-        <RefreshButton />
-      </div>
-    );
-
-    // Toggle button for switching between list and tree view
-    const ViewToggle = () => (
-      <div className="flex items-center gap-2 p-2 border-b border-gray-200 bg-gray-50">
-        <button
-          onClick={() => props.viewMode.setMode('list')}
-          className={cn(
-            'px-3 py-1 text-sm rounded transition-colors',
-            viewMode === 'list'
-              ? 'bg-blue-500 text-white'
-              : 'bg-white text-gray-700 hover:bg-gray-100'
-          )}
-        >
-          List
-        </button>
-        <button
-          onClick={() => props.viewMode.setMode('tree')}
-          className={cn(
-            'px-3 py-1 text-sm rounded transition-colors',
-            viewMode === 'tree'
-              ? 'bg-blue-500 text-white'
-              : 'bg-white text-gray-700 hover:bg-gray-100'
-          )}
-        >
-          Tree
-        </button>
-      </div>
-    );
 
     const ListView =
       viewMode === 'list' ? <TraceListItems /> : <TraceTreeView />;
