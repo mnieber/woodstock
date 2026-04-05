@@ -24,14 +24,13 @@ export const TracesStateProvider = observer((props: PropsT) => {
           ['loading', () => isQueryLoading(queryTraces), 'queryTraces']
         );
       },
-      get selectedTrace() {
-        const selectedTraces = tracesState.tracesCtr.selection.items;
+      get trace() {
         return updateSources(
           {
-            resource: selectedTraces.length > 0 ? selectedTraces[0] : undefined,
-            resourceName: 'selectedTrace',
+            resource: tracesState.tracesCtr.highlight.item,
+            resourceName: 'trace',
           },
-          ['loading', () => isQueryLoading(queryTraces), 'selectedTrace']
+          ['loading', () => isQueryLoading(queryTraces), 'trace']
         );
       },
     })
@@ -41,17 +40,8 @@ export const TracesStateProvider = observer((props: PropsT) => {
     return createGetProps({
       tracesState: () => tracesState,
       traces: () => cache.traces,
-      selectedTrace: () => cache.selectedTrace,
-      selectedTraceKey: () => {
-        const selectedTraces = tracesState.tracesCtr.selection.items;
-        return selectedTraces.length > 0 ? selectedTraces[0].traceKey : null;
-      },
-      selectTrace: (traceKey: string) => {
-        const trace = cache.traces.find((t: any) => t.traceKey === traceKey);
-        if (trace) {
-          tracesState.tracesCtr.selection.selectItem({ itemId: trace.traceKey });
-        }
-      },
+      trace: () => cache.trace,
+      tracesHighlight: () => tracesState.tracesCtr.highlight,
       tracesSelection: () => tracesState.tracesCtr.selection,
       viewMode: () => tracesState.tracesCtr.viewMode,
       filter: () => tracesState.tracesCtr.filter,

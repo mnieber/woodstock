@@ -10,12 +10,12 @@ export type PropsT = {
 };
 
 const ContextProps = {
-  selectedTrace: tracesCtx.selectedTrace,
+  trace: tracesCtx.trace,
 };
 
 export const TraceDetailView = observer(
   withContextProps((props: PropsT & typeof ContextProps) => {
-    const trace = props.selectedTrace;
+    const trace = props.trace;
 
     if (!trace) {
       return (

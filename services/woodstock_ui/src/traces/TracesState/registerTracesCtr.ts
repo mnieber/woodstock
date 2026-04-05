@@ -13,6 +13,10 @@ const mapData = (state: TracesState) => {
     data: {
       traces: () => state.props.getTraces(),
     },
+    highlight: {
+      item: () =>
+        ctr.highlight.itemId ? getTraceByKey(ctr.highlight.itemId) : undefined,
+    },
     selection: {
       selectableIds: () => R.map(R.prop('traceKey'), ctr.data.traces),
       items: () =>
@@ -31,6 +35,9 @@ const setCallbacks = (state: TracesState) => {
     selectItem: {
       selectItem(this: Cbs<Selection['selectItem']>) {
         handleSelectItem(ctr.selection, this.args);
+        if (!this.args.isCtrl && !this.args.isShift) {
+          ctr.highlight.set({ itemId: this.args.itemId });
+        }
       },
     },
   };

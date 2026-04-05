@@ -13,7 +13,7 @@ type PropsT = {};
 
 const ContextProps = {
   traces: tracesCtx.traces,
-  selectedTrace: tracesCtx.selectedTrace,
+  trace: tracesCtx.trace,
   tracesSelection: tracesCtx.tracesSelection,
 };
 
@@ -22,16 +22,16 @@ export const SelectTraceEffect = observer(
     const params = useParams() as ObjT;
     const { updateRefUrl, hasUrlChanged } = useRefUrl();
 
-    const { tracesSelection, selectedTrace, traces } = props;
+    const { tracesSelection, trace, traces } = props;
     // In wouter, wildcard routes use "*" as the param key
     const traceKeyFromUrl = params['*'];
     const traceFromUrl = R.find(
       (x: TraceRecordT) => x.traceKey === traceKeyFromUrl
     )(traces);
-    const isTraceInSyncWithUrl = selectedTrace?.traceKey === traceFromUrl?.traceKey;
+    const isTraceInSyncWithUrl = trace?.traceKey === traceFromUrl?.traceKey;
 
-    const selectTrace = (trace?: TraceRecordT) => {
-      tracesSelection.selectItem({ itemId: trace?.traceKey });
+    const selectTrace = (traceToSelect?: TraceRecordT) => {
+      tracesSelection.selectItem({ itemId: traceToSelect?.traceKey });
     };
 
     React.useEffect(() => {

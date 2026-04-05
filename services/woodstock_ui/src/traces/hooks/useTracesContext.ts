@@ -1,6 +1,6 @@
 import * as R from 'ramda';
 import React from 'react';
-import { Selection } from 'skandha-facets';
+import { Highlight, Selection } from 'skandha-facets';
 import { TraceRecordT } from '/src/api/types/TraceRecordT';
 import { TracesState } from '/src/traces/TracesState';
 
@@ -20,9 +20,8 @@ export const tracesCtx = R.mergeAll([
   {
     tracesState: [useTracesContext, 'tracesState'] as any as TracesState,
     traces: [useTracesContext, 'traces'] as any as TraceRecordT[],
-    selectedTrace: [useTracesContext, 'selectedTrace'] as any as TraceRecordT,
-    selectedTraceKey: [useTracesContext, 'selectedTraceKey'] as any as string | null,
-    selectTrace: [useTracesContext, 'selectTrace'] as any as (traceKey: string) => void,
+    trace: [useTracesContext, 'trace'] as any as TraceRecordT,
+    tracesHighlight: [useTracesContext, 'tracesHighlight'] as any as Highlight,
     tracesSelection: [useTracesContext, 'tracesSelection'] as any as Selection,
     viewMode: [useTracesContext, 'viewMode'] as any as any,
     filter: [useTracesContext, 'filter'] as any as any,

@@ -8,9 +8,9 @@ export type PropsT = {
 };
 
 const stateColors: Record<TraceStateT, string> = {
-  ok: 'bg-green-500',
-  warning: 'bg-yellow-500',
-  error: 'bg-red-500',
+  ok: 'bg-green-100 text-green-800 border-green-200',
+  warning: 'bg-yellow-100 text-yellow-800 border-yellow-200',
+  error: 'bg-red-100 text-red-800 border-red-200',
 };
 
 const stateLabels: Record<TraceStateT, string> = {
@@ -21,13 +21,13 @@ const stateLabels: Record<TraceStateT, string> = {
 
 export const TraceStateBadge: React.FC<PropsT> = (props: PropsT) => {
   return (
-    <div
+    <span
       className={cn(
-        'TraceStateBadge inline-flex items-center justify-center px-2 py-1 text-xs font-semibold text-white rounded',
+        'TraceStateBadge inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium border',
         [stateColors[props.state], props.className]
       )}
     >
       {stateLabels[props.state]}
-    </div>
+    </span>
   );
 };

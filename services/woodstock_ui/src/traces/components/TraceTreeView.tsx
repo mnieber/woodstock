@@ -1,8 +1,10 @@
 import React from 'react';
 import { observer } from 'mobx-react-lite';
 import { withContextProps } from 'react-props-from-context';
+import { Link } from 'wouter';
 import { traceTreeCtx } from '/src/traces/hooks/useTraceTreeContext';
 import { tracesCtx } from '/src/traces/hooks/useTracesContext';
+import { tracesNav } from '/src/traces/routes';
 import { TraceNodeT } from '/src/traces/types';
 import { TraceStateBadge } from '/src/traces/components/TraceStateBadge';
 import { cn } from '/src/utils/classnames';
@@ -14,19 +16,17 @@ export type PropsT = {
 const ContextProps = {
   nodes: traceTreeCtx.nodes,
   expansion: traceTreeCtx.expansion,
-  selectedTraceKey: tracesCtx.selectedTraceKey,
-  selectTrace: tracesCtx.selectTrace,
+  trace: tracesCtx.trace,
 };
 
 const TreeNode: React.FC<{
   node: TraceNodeT;
   expansion: typeof ContextProps.expansion;
-  selectedTraceKey: string | null;
-  selectTrace: (traceKey: string) => void;
+  highlightedTraceKey: string | undefined;
 }> = observer((props) => {
   const hasChildren = props.node.children.length > 0;
   const isExpanded = props.expansion.isExpanded(props.node.id);
-  const isSelected = props.node.trace?.traceKey === props.selectedTraceKey;
+  const isHighlighted = props.node.trace?.traceKey === props.highlightedTraceKey;
 
   const handleToggle = (e: React.MouseEvent) => {
     e.stopPropagation();
@@ -35,49 +35,64 @@ const TreeNode: React.FC<{
     }
   };
 
-  const handleSelect = () => {
-    if (props.node.trace) {
-      props.selectTrace(props.node.trace.traceKey);
-    }
-  };
-
   const indentStyle = {
     paddingLeft: `${props.node.depth * 20 + 8}px`,
   };
 
+  const url = props.node.trace
+    ? tracesNav.trace({ traceKey: props.node.trace.traceKey }).url
+    : '#';
+
+  const content = (
+    <>
+      {/* Expand/collapse icon */}
+      {hasChildren && (
+        <button
+          onClick={handleToggle}
+          className="flex-shrink-0 w-4 h-4 flex items-center justify-center text-gray-600 hover:text-gray-800"
+        >
+          {isExpanded ? '▼' : '▶'}
+        </button>
+      )}
+      {!hasChildren && <div className="w-4" />}
+
+      {/* Node label */}
+      <span className="flex-1 text-sm font-medium text-gray-800">
+        {props.node.label}
+      </span>
+
+      {/* State badge for leaf nodes with trace data */}
+      {props.node.trace && (
+        <TraceStateBadge state={props.node.trace.traceState} />
+      )}
+    </>
+  );
+
   return (
     <div className="TreeNode">
-      <div
-        className={cn(
-          'flex items-center gap-2 py-2 px-2 cursor-pointer hover:bg-gray-100 border-b border-gray-200',
-          {
-            'bg-blue-50 hover:bg-blue-100': isSelected,
-          }
-        )}
-        style={indentStyle}
-        onClick={handleSelect}
-      >
-        {/* Expand/collapse icon */}
-        {hasChildren && (
-          <button
-            onClick={handleToggle}
-            className="flex-shrink-0 w-4 h-4 flex items-center justify-center text-gray-600 hover:text-gray-800"
-          >
-            {isExpanded ? '▼' : '▶'}
-          </button>
-        )}
-        {!hasChildren && <div className="w-4" />}
-
-        {/* Node label */}
-        <span className="flex-1 text-sm font-medium text-gray-800">
-          {props.node.label}
-        </span>
-
-        {/* State badge for leaf nodes with trace data */}
-        {props.node.trace && (
-          <TraceStateBadge state={props.node.trace.traceState} />
-        )}
-      </div>
+      {props.node.trace ? (
+        <Link
+          href={url}
+          className={cn(
+            'flex items-center gap-2 py-2 px-2 cursor-pointer hover:bg-gray-100 border-b border-gray-200',
+            {
+              'bg-blue-50 hover:bg-blue-100': isHighlighted,
+            }
+          )}
+          style={indentStyle}
+        >
+          {content}
+        </Link>
+      ) : (
+        <div
+          className={cn(
+            'flex items-center gap-2 py-2 px-2 border-b border-gray-200'
+          )}
+          style={indentStyle}
+        >
+          {content}
+        </div>
+      )}
 
       {/* Render children if expanded */}
       {hasChildren && isExpanded && (
@@ -87,8 +102,7 @@ const TreeNode: React.FC<{
               key={child.id}
               node={child}
               expansion={props.expansion}
-              selectedTraceKey={props.selectedTraceKey}
-              selectTrace={props.selectTrace}
+              highlightedTraceKey={props.highlightedTraceKey}
             />
           ))}
         </div>
@@ -109,8 +123,7 @@ export const TraceTreeView = observer(
             key={node.id}
             node={node}
             expansion={props.expansion}
-            selectedTraceKey={props.selectedTraceKey}
-            selectTrace={props.selectTrace}
+            highlightedTraceKey={props.trace?.traceKey}
           />
         ))}
       </div>
