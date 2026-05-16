@@ -62,7 +62,12 @@ export const TraceFilterForm = observer(
         handleValidate={form.getHandleValidate()}
         handleSubmit={form.getHandleSubmit(props)}
       >
-        <div className={cn('TraceFilterForm', ['flex flex-col gap-3', props.className])}>
+        <div
+          className={cn('TraceFilterForm', [
+            'flex flex-col gap-3 px-2',
+            props.className,
+          ])}
+        >
           <h3 className="text-sm font-semibold text-gray-700">Filter Traces</h3>
 
           <Field fieldName={formFields.traceKeyPrefix} tabOnEnter={true}>
@@ -92,7 +97,11 @@ export const TraceFilterForm = observer(
 
           <div className="flex gap-2 pt-2">
             <FormSaveButton label="Apply" className="flex-1" />
-            <FormClearButton label="Clear" onClick={handleClear} className="flex-1" />
+            <FormClearButton
+              label="Clear"
+              onClick={handleClear}
+              className="flex-1"
+            />
           </div>
         </div>
       </FormStateProvider>
