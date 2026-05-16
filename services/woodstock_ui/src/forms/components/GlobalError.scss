@@ -1,0 +1,5 @@
+.GlobalError {
+  @apply text-red-500 text-xs font-medium;
+  @apply bg-red-50 border border-red-200 rounded;
+  @apply px-3 py-2;
+}
