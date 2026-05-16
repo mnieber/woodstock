@@ -1,6 +1,8 @@
-import React from 'react';
 import { observer } from 'mobx-react-lite';
-import { FormStateProvider, useFormStateContext } from 'react-form-state-context';
+import {
+  FormStateProvider,
+  useFormStateContext,
+} from 'react-form-state-context';
 import { withContextProps } from 'react-props-from-context';
 import { form } from './form';
 import { tracesCtx } from '/src/traces/hooks/useTracesContext';
@@ -36,16 +38,25 @@ const TraceFilterFormInner = observer((props: PropsT & typeof ContextProps) => {
   };
 
   return (
-    <form onSubmit={formState.handleSubmit} className={cn('TraceFilterForm p-4 space-y-4', props.className)}>
-      <h3 className="text-sm font-semibold text-gray-700 mb-3">Filter Traces</h3>
+    <form
+      onSubmit={() => formState.handleSubmit}
+      className={cn('TraceFilterForm p-4 space-y-4', props.className)}
+    >
+      <h3 className="text-sm font-semibold text-gray-700 mb-3">
+        Filter Traces
+      </h3>
 
       {/* Trace Key Prefix */}
       <div className="space-y-1">
-        <label className="text-xs font-medium text-gray-600">Trace Key Prefix</label>
+        <label className="text-xs font-medium text-gray-600">
+          Trace Key Prefix
+        </label>
         <input
           type="text"
           value={formState.getValue(formFields.traceKeyPrefix) || ''}
-          onChange={(e) => formState.setValue(formFields.traceKeyPrefix, e.target.value)}
+          onChange={(e) =>
+            formState.setValue(formFields.traceKeyPrefix, e.target.value)
+          }
           placeholder="e.g., job-123"
           className="w-full px-3 py-2 text-sm border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
         />
@@ -56,7 +67,9 @@ const TraceFilterFormInner = observer((props: PropsT & typeof ContextProps) => {
         <label className="text-xs font-medium text-gray-600">State</label>
         <select
           value={formState.getValue(formFields.traceState) || ''}
-          onChange={(e) => formState.setValue(formFields.traceState, e.target.value as any)}
+          onChange={(e) =>
+            formState.setValue(formFields.traceState, e.target.value as any)
+          }
           className="w-full px-3 py-2 text-sm border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
         >
           <option value="">All States</option>
@@ -72,7 +85,9 @@ const TraceFilterFormInner = observer((props: PropsT & typeof ContextProps) => {
         <input
           type="text"
           value={formState.getValue(formFields.author) || ''}
-          onChange={(e) => formState.setValue(formFields.author, e.target.value)}
+          onChange={(e) =>
+            formState.setValue(formFields.author, e.target.value)
+          }
           placeholder="e.g., alice"
           className="w-full px-3 py-2 text-sm border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
         />
@@ -84,7 +99,9 @@ const TraceFilterFormInner = observer((props: PropsT & typeof ContextProps) => {
         <input
           type="datetime-local"
           value={formState.getValue(formFields.timeRangeStart) || ''}
-          onChange={(e) => formState.setValue(formFields.timeRangeStart, e.target.value)}
+          onChange={(e) =>
+            formState.setValue(formFields.timeRangeStart, e.target.value)
+          }
           className="w-full px-3 py-2 text-sm border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
         />
       </div>
@@ -95,7 +112,9 @@ const TraceFilterFormInner = observer((props: PropsT & typeof ContextProps) => {
         <input
           type="datetime-local"
           value={formState.getValue(formFields.timeRangeEnd) || ''}
-          onChange={(e) => formState.setValue(formFields.timeRangeEnd, e.target.value)}
+          onChange={(e) =>
+            formState.setValue(formFields.timeRangeEnd, e.target.value)
+          }
           className="w-full px-3 py-2 text-sm border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
         />
       </div>

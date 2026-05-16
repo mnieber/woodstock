@@ -4,8 +4,6 @@ services:
       context: ${ROOT_DIR}
       dockerfile: services/woodstock_indexer/Dockerfile.local
     command: sleep infinity
-    depends_on:
-      localstack: {condition: service_healthy}
     env_file:
       - env_files/woodstock-indexer.env
     image: woodstock_indexer_local
@@ -14,24 +12,18 @@ services:
       context: ${ROOT_DIR}
       dockerfile: services/woodstock_server/Dockerfile.local
     command: sleep infinity
-    depends_on:
-      localstack: {condition: service_healthy}
     env_file:
       - env_files/woodstock-server.env
     image: woodstock_server_local
     ports:
-      - 8000:8000
-  localstack:
-    container_name: woodstock_localstack
-    image: "localstack/localstack:3.4.0"
-    ports:
-      - 4566:4566
+      - 8050:8050
+  woodstock-ui:
+    build:
+      context: ${ROOT_DIR}
+      dockerfile: services/woodstock_ui/Dockerfile.local
+    command: yarn dev --host
     env_file:
-      - env_files/localstack.env
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:4566/_localstack/health"]
-      interval: 5s
-      timeout: 5s
-      retries: 5
-    volumes:
-      - "${ROOT_DIR}/localstack/scripts/initaws.d:/etc/localstack/init/ready.d"
+      - env_files/woodstock-ui.env
+    ports:
+      - 3003:3003
+    image: woodstock_ui_local

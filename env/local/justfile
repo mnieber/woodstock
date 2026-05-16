@@ -43,7 +43,7 @@ shell-server:
 
 # Run woodstock-indexer, woodstock-server and woodstock-ui against a local FS directory.
 # Usage: just woodstock-ui /opt/projects/calcium/woodstock/data
-run-woodstock data_dir:
+run-woodstock data_dir: compile-env-files
     #!/usr/bin/env bash
     set -euox pipefail
     mkdir -p "{{ data_dir }}"

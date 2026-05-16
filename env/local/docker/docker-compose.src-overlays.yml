@@ -5,3 +5,6 @@ services:
   woodstock-server:
     volumes:
       - ${ROOT_DIR}/libs/woodstock:/app/libs/woodstock
+  woodstock-ui:
+    volumes:
+      - ${ROOT_DIR}/services/woodstock_ui:/app/src
