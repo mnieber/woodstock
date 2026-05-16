@@ -1,7 +1,5 @@
 import axios from 'axios';
 
-axios.defaults.withCredentials = true;
-
 export const hostUrl = window.location.host.startsWith('localhost')
   ? import.meta.env.VITE_LOCALHOST_API_ENDPOINT ?? 'http://localhost:8080'
   : import.meta.env.VITE_BACKEND_API_ENDPOINT ?? '';

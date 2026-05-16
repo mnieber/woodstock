@@ -1,4 +1,5 @@
 import json
+import re
 
 import bottle
 
@@ -8,6 +9,19 @@ from woodstock.server.models.index_state import IndexState
 from woodstock.storage.models.file_storage import FileStorage
 
 app = bottle.Bottle()
+
+_LOCALHOST_ORIGIN = re.compile(r'^https?://localhost(:\d+)?$')
+
+
+def _add_cors_headers():
+    origin = bottle.request.environ.get('HTTP_ORIGIN', '')
+    if _LOCALHOST_ORIGIN.match(origin):
+        bottle.response.set_header('Access-Control-Allow-Origin', origin)
+
+
+@app.hook('after_request')
+def apply_cors():
+    _add_cors_headers()
 
 
 @app.route("/query-traces")

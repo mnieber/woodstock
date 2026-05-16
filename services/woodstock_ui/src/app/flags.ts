@@ -6,6 +6,6 @@ export const flags = observable({
   logResourceStates: true,
   logHistory: false,
   logStateProviders: false,
-  useMsw: true,
+  useMsw: false,
   mockApp: false,
 });
