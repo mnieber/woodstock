@@ -1,7 +1,7 @@
-type TraceState = "ok" | "warn" | "error";
+type TraceStates = "ok" | "warn" | "error";
 
 interface TraceStateBadgeProps {
-  state: TraceState;
+  state: TraceStates;
 }
 
 export function TraceStateBadge(props: TraceStateBadgeProps) {

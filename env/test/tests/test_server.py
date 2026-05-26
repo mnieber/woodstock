@@ -5,8 +5,7 @@ import requests
 from conftest import just
 from woodstock.storage.models.s3_file_storage import S3FileStorage
 from woodstock.trace.actions.write_trace import WriteTraceForm, write_trace
-from woodstock.trace.enums import TraceState
-
+from woodstock.trace.enums import TraceStates
 
 BUCKET = "woodstock-test"
 SERVER_URL = "http://localhost:8080"
@@ -41,18 +40,24 @@ def server():
 def test_query_traces_returns_indexed_traces(server):
     storage = S3FileStorage(bucket_name=BUCKET)
 
-    write_trace(WriteTraceForm(
-        trace_key="job-1/step-1",
-        author="alice",
-        trace_state=TraceState.OK,
-        payload={"status": "value://done"},
-    ), storage)
-    write_trace(WriteTraceForm(
-        trace_key="job-1/step-2",
-        author="bob",
-        trace_state=TraceState.ERROR,
-        payload={},
-    ), storage)
+    write_trace(
+        WriteTraceForm(
+            trace_key="job-1/step-1",
+            author="alice",
+            trace_state=TraceStates.OK,
+            payload={"status": "value://done"},
+        ),
+        storage,
+    )
+    write_trace(
+        WriteTraceForm(
+            trace_key="job-1/step-2",
+            author="bob",
+            trace_state=TraceStates.ERROR,
+            payload={},
+        ),
+        storage,
+    )
 
     # Server is already running when the indexer writes — concurrent access.
     just("run-indexer")
@@ -68,23 +73,31 @@ def test_query_traces_returns_indexed_traces(server):
 def test_query_traces_filters_by_prefix(server):
     storage = S3FileStorage(bucket_name=BUCKET)
 
-    write_trace(WriteTraceForm(
-        trace_key="job-1/step-1",
-        author="alice",
-        trace_state=TraceState.OK,
-        payload={},
-    ), storage)
-    write_trace(WriteTraceForm(
-        trace_key="job-2/step-1",
-        author="alice",
-        trace_state=TraceState.OK,
-        payload={},
-    ), storage)
+    write_trace(
+        WriteTraceForm(
+            trace_key="job-1/step-1",
+            author="alice",
+            trace_state=TraceStates.OK,
+            payload={},
+        ),
+        storage,
+    )
+    write_trace(
+        WriteTraceForm(
+            trace_key="job-2/step-1",
+            author="alice",
+            trace_state=TraceStates.OK,
+            payload={},
+        ),
+        storage,
+    )
 
     # Server is already running when the indexer writes — concurrent access.
     just("run-indexer")
 
-    response = requests.get(f"{SERVER_URL}/query-traces", params={"trace_key_prefix": "job-1"})
+    response = requests.get(
+        f"{SERVER_URL}/query-traces", params={"trace_key_prefix": "job-1"}
+    )
     assert response.status_code == 200
     data = response.json()
     assert len(data["items"]) == 1

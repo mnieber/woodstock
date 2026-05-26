@@ -3,7 +3,7 @@ import json
 import pytest
 from woodstock.storage.models.local_fs_file_storage import LocalFsFileStorage
 from woodstock.trace.actions.write_trace import WriteTraceForm, write_trace
-from woodstock.trace.enums import TraceState
+from woodstock.trace.enums import TraceStates
 from woodstock.trace.models.blob import Blob
 
 
@@ -16,7 +16,7 @@ def test_blob_is_uploaded_to_tree(storage):
     form = WriteTraceForm(
         trace_key="job-123/calc-456/calculation_failed",
         author="calcium",
-        trace_state=TraceState.ERROR,
+        trace_state=TraceStates.ERROR,
         payload={"severity": "value://high"},
         blobs=[Blob(name="error.md", content=b"# Error\nDivision by zero")],
     )
@@ -30,7 +30,7 @@ def test_tree_ref_is_inserted_into_payload(storage):
     form = WriteTraceForm(
         trace_key="job-123/calc-456/calculation_failed",
         author="calcium",
-        trace_state=TraceState.ERROR,
+        trace_state=TraceStates.ERROR,
         payload={"severity": "value://high"},
         blobs=[Blob(name="error.md", content=b"# Error")],
     )
@@ -49,7 +49,7 @@ def test_multiple_blobs(storage):
     form = WriteTraceForm(
         trace_key="job-1/node/event",
         author="calcium",
-        trace_state=TraceState.OK,
+        trace_state=TraceStates.OK,
         payload={},
         blobs=[
             Blob(name="report.md", content=b"report"),
@@ -72,7 +72,7 @@ def test_original_payload_is_not_mutated(storage):
     form = WriteTraceForm(
         trace_key="job-1/node/event",
         author="calcium",
-        trace_state=TraceState.OK,
+        trace_state=TraceStates.OK,
         payload=original_payload,
         blobs=[Blob(name="report.md", content=b"report")],
     )

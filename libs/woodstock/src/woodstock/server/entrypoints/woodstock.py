@@ -6,14 +6,17 @@ import time
 
 import bottle
 
-from woodstock.server.actions.delete_old_traces import DeleteOldTracesForm, delete_old_traces
+from woodstock.server.actions.delete_old_traces import (
+    DeleteOldTracesForm,
+    delete_old_traces,
+)
 from woodstock.server.actions.poll_trace_log import PollTraceLogForm, poll_trace_log
 from woodstock.server.actions.upsert_trace import UpsertTraceForm, upsert_trace
 from woodstock.server.api_views.api_views import app
 from woodstock.server.models.index_state import IndexState
 from woodstock.settings import WOODSTOCK_DB_PATH, WOODSTOCK_POLL_INTERVAL_SECONDS
 from woodstock.storage.rules.get_file_storage import get_file_storage
-from woodstock.trace.enums import TraceState
+from woodstock.trace.enums import TraceStates
 from woodstock.trace.models.trace_record import TraceRecord
 from woodstock.trace.utils.uuid7 import uuid7
 
@@ -46,7 +49,7 @@ def _run_server(args: argparse.Namespace) -> None:
         UpsertTraceForm(
             trace_record=TraceRecord(
                 trace_key="woodstock/server/started",
-                trace_state=TraceState.OK,
+                trace_state=TraceStates.OK,
                 author="woodstock-server",
                 timestamp=datetime.datetime.now(datetime.timezone.utc).isoformat(),
             ),
@@ -76,7 +79,9 @@ def _parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(prog="woodstock")
     sub = parser.add_subparsers(dest="command", required=True)
 
-    p_indexer = sub.add_parser("run-indexer", help="Poll the trace log and update the DuckDB index")
+    p_indexer = sub.add_parser(
+        "run-indexer", help="Poll the trace log and update the DuckDB index"
+    )
     p_indexer.add_argument(
         "--no-loop",
         action="store_true",
@@ -87,7 +92,9 @@ def _parse_args() -> argparse.Namespace:
     p_server.add_argument("--host", default="0.0.0.0")
     p_server.add_argument("--port", type=int, default=8080)
 
-    p_delete = sub.add_parser("delete-old-traces", help="Delete traces older than a given number of days")
+    p_delete = sub.add_parser(
+        "delete-old-traces", help="Delete traces older than a given number of days"
+    )
     p_delete.add_argument(
         "--retention-days",
         type=int,

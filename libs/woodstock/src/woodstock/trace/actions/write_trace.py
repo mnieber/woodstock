@@ -6,7 +6,7 @@ from datetime import datetime, timezone
 from dataclassy import dataclass
 from woodstock.storage.models.file_storage import FileStorage
 from woodstock.trace.actions.upload_blob import upload_blob
-from woodstock.trace.enums import TraceState
+from woodstock.trace.enums import TraceStates
 from woodstock.trace.models.blob import Blob
 from woodstock.trace.models.trace_record import TraceRecord
 from woodstock.trace.utils.uuid7 import uuid7
@@ -18,7 +18,7 @@ logger = logging.getLogger(__name__)
 class WriteTraceForm:
     trace_key: str
     author: str
-    trace_state: TraceState
+    trace_state: TraceStates
     payload: dict
     blobs: T.List[Blob] = []
     label_patch: T.Dict[str, T.Dict[str, T.Any]] = {}

@@ -2,13 +2,13 @@ import typing as T
 
 from dataclassy import dataclass
 
-from woodstock.trace.enums import TraceState
+from woodstock.trace.enums import TraceStates
 
 
 @dataclass
 class TraceRecord:
     trace_key: str
-    trace_state: TraceState
+    trace_state: TraceStates
     author: str
     timestamp: str
     payload: T.Dict[str, str] = {}

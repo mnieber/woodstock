@@ -1,7 +1,7 @@
 from enum import Enum
 
 
-class TraceState(str, Enum):
+class TraceStates(str, Enum):
     OK = "ok"
     WARNING = "warning"
     ERROR = "error"

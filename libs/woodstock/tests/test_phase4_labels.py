@@ -3,7 +3,7 @@ import json
 import pytest
 from woodstock.storage.models.local_fs_file_storage import LocalFsFileStorage
 from woodstock.trace.actions.write_trace import WriteTraceForm, write_trace
-from woodstock.trace.enums import TraceState
+from woodstock.trace.enums import TraceStates
 
 
 @pytest.fixture
@@ -20,7 +20,7 @@ def test_labels_are_written_to_trace_record(storage):
     form = WriteTraceForm(
         trace_key="job-123/calc-456/calculation_started",
         author="calcium",
-        trace_state=TraceState.OK,
+        trace_state=TraceStates.OK,
         payload={"status": "value://started"},
         label_patch={
             "job-123": {"active": True},
@@ -40,7 +40,7 @@ def test_null_label_value_is_written(storage):
     form = WriteTraceForm(
         trace_key="job-123/calc-456/calculation_finished",
         author="calcium",
-        trace_state=TraceState.OK,
+        trace_state=TraceStates.OK,
         payload={},
         label_patch={"job-123/calc-456": {"active": None}},
     )
@@ -54,7 +54,7 @@ def test_labels_default_to_empty(storage):
     form = WriteTraceForm(
         trace_key="job-123/calc-456/calculation_started",
         author="calcium",
-        trace_state=TraceState.OK,
+        trace_state=TraceStates.OK,
         payload={},
     )
     write_trace(form, storage)
