@@ -25,9 +25,12 @@ export const useTracesState = (props: PropsT) => {
   const tracesState = useBuilder(() => {
     const state = new TracesState({
       getTraces: () => {
-        return graftResourceStatesFromMemo({
+        const items = graftResourceStatesFromMemo({
           resources: queryTraces.data?.items ?? [],
         });
+        return [...items].sort(
+          (a, b) => b.timestamp.localeCompare(a.timestamp)
+        );
       },
     });
 

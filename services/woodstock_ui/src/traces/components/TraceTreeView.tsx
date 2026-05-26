@@ -8,6 +8,7 @@ import { tracesNav } from '/src/traces/routes';
 import { TraceNodeT } from '/src/traces/types';
 import { TraceStateBadge } from '/src/traces/components/TraceStateBadge';
 import { cn } from '/src/utils/classnames';
+import { formatTimestampAbsolute } from '/src/traces/utils/formatTimestamp';
 
 export type PropsT = {
   className?: any;
@@ -26,7 +27,8 @@ const TreeNode: React.FC<{
 }> = observer((props) => {
   const hasChildren = props.node.children.length > 0;
   const isExpanded = props.expansion.isExpanded(props.node.id);
-  const isHighlighted = props.node.trace?.traceKey === props.highlightedTraceKey;
+  const isHighlighted =
+    props.node.trace?.traceKey === props.highlightedTraceKey;
 
   const handleToggle = (e: React.MouseEvent) => {
     e.stopPropagation();
@@ -60,6 +62,17 @@ const TreeNode: React.FC<{
       <span className="flex-1 text-sm font-medium text-gray-800">
         {props.node.label}
       </span>
+
+      {/* Date column: own timestamp for leaf nodes, oldest descendant for group nodes */}
+      {(() => {
+        const ts =
+          props.node.trace?.timestamp ?? _getOldestTimestamp(props.node);
+        return ts ? (
+          <span className="text-xs text-gray-500 w-40 text-right">
+            {formatTimestampAbsolute(ts)}
+          </span>
+        ) : null;
+      })()}
 
       {/* State badge for leaf nodes with trace data */}
       {props.node.trace && (
@@ -130,3 +143,14 @@ export const TraceTreeView = observer(
     );
   }, ContextProps)
 );
+
+const _getOldestTimestamp = (node: TraceNodeT): string | undefined => {
+  const timestamps: string[] = [];
+  const collect = (n: TraceNodeT) => {
+    if (n.trace) timestamps.push(n.trace.timestamp);
+    n.children.forEach(collect);
+  };
+  collect(node);
+  if (timestamps.length === 0) return undefined;
+  return timestamps.reduce((a, b) => (a < b ? a : b));
+};

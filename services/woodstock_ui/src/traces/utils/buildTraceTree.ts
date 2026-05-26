@@ -16,9 +16,9 @@ import { TraceNodeT, createTraceNode } from '/src/traces/types';
  *       └── calculation_completed
  */
 export const buildTraceTree = (traces: TraceRecordT[]): TraceNodeT[] => {
-  // Sort traces by timestamp (older events first)
+  // Sort traces by timestamp descending (newest first)
   const sortedTraces = [...traces].sort((a, b) =>
-    a.timestamp.localeCompare(b.timestamp)
+    b.timestamp.localeCompare(a.timestamp)
   );
 
   const nodeMap = new Map<string, TraceNodeT>();
