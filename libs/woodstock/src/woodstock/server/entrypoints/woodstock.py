@@ -1,4 +1,5 @@
 import argparse
+import datetime
 import logging
 import sqlite3
 import time
@@ -7,10 +8,14 @@ import bottle
 
 from woodstock.server.actions.delete_old_traces import DeleteOldTracesForm, delete_old_traces
 from woodstock.server.actions.poll_trace_log import PollTraceLogForm, poll_trace_log
+from woodstock.server.actions.upsert_trace import UpsertTraceForm, upsert_trace
 from woodstock.server.api_views.api_views import app
 from woodstock.server.models.index_state import IndexState
 from woodstock.settings import WOODSTOCK_DB_PATH, WOODSTOCK_POLL_INTERVAL_SECONDS
 from woodstock.storage.rules.get_file_storage import get_file_storage
+from woodstock.trace.enums import TraceState
+from woodstock.trace.models.trace_record import TraceRecord
+from woodstock.trace.utils.uuid7 import uuid7
 
 logger = logging.getLogger(__name__)
 
@@ -36,6 +41,20 @@ def _run_indexer(args: argparse.Namespace) -> None:
 
 def _run_server(args: argparse.Namespace) -> None:
     file_storage = get_file_storage()
+    init_state = IndexState(conn=_open_db())
+    upsert_trace(
+        UpsertTraceForm(
+            trace_record=TraceRecord(
+                trace_key="woodstock/server/started",
+                trace_state=TraceState.OK,
+                author="woodstock-server",
+                timestamp=datetime.datetime.now(datetime.timezone.utc).isoformat(),
+            ),
+            uuidv7=uuid7(),
+        ),
+        init_state,
+    )
+    init_state.conn.close()
     index_state = IndexState(conn=_open_db(read_only=True))
     app.config["file_storage"] = file_storage
     app.config["index_state"] = index_state
