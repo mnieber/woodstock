@@ -38,7 +38,7 @@ export type PropsT = {
   className?: any;
 };
 
-export const TraceFilterForm = observer(
+export const TraceFilterFormView = observer(
   withContextProps((props: PropsT & typeof ContextProps) => {
     const initialValues = form.getInitialValues(props);
     const formStateRef = React.useRef<FormState>(null);
@@ -63,7 +63,7 @@ export const TraceFilterForm = observer(
         handleSubmit={form.getHandleSubmit(props)}
       >
         <div
-          className={cn('TraceFilterForm', [
+          className={cn('TraceFilterFormView', [
             'flex flex-col gap-3 px-2',
             props.className,
           ])}

@@ -6,7 +6,7 @@ import { appCtx } from '/src/app/hooks/useAppContext';
 import { TraceDetailView } from '/src/traces/components/TraceDetailView';
 import { TraceListView } from '/src/traces/components/TraceListView';
 import { TraceTreeView } from '/src/traces/components/TraceTreeView';
-import { TraceFilterForm } from '/src/traces/components/TraceFilterForm';
+import { TraceFilterFormView } from '/src/traces/components/TraceFilterFormView';
 import { TopRibbon } from '/src/traces/components/TopRibbon';
 import { ViewToggle } from '/src/traces/components/ViewToggle';
 import { tracesCtx } from '/src/traces/hooks/useTracesContext';
@@ -45,7 +45,7 @@ export const TraceExplorerView = observer(
               {/* Filter Panel */}
               <Panel defaultSize={20} minSize={15} maxSize={30}>
                 <div className="h-full overflow-y-auto border-r border-gray-200 bg-white">
-                  <TraceFilterForm />
+                  <TraceFilterFormView />
                 </div>
               </Panel>
               <PanelResizeHandle className="w-1 bg-gray-200 hover:bg-gray-300 transition-colors" />

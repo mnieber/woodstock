@@ -1,6 +1,6 @@
 import { action } from 'mobx';
 import { FormState } from 'react-form-state-context';
-import { formFields as ff } from './index';
+import { formFields as ff } from './TraceFilterFormView';
 import { Filter } from '/src/traces/TracesState/facets/Filter';
 
 export type FormPropsT = {
