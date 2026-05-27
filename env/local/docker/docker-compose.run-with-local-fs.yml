@@ -17,3 +17,6 @@ services:
       WOODSTOCK_DB_PATH: /app/data/woodstock.db
     volumes:
       - ${WOODSTOCK_LOCAL_FS_DIR}:/app/data
+
+  woodstock-ui:
+    command: yarn dev --host

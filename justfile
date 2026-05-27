@@ -58,5 +58,5 @@ run-woodstock data_dir: compile-env-files
     docker compose \
         --file "${COMPOSE_DIR}/docker-compose.yml" \
         --file "${COMPOSE_DIR}/docker-compose.src-overlays.yml" \
-        --file "${COMPOSE_DIR}/docker-compose.local-fs.yml" \
+        --file "${COMPOSE_DIR}/docker-compose.run-with-local-fs.yml" \
         up woodstock-indexer woodstock-server woodstock-ui

@@ -3,8 +3,7 @@ import { observer } from 'mobx-react-lite';
 import { FormState, FormStateProvider } from 'react-form-state-context';
 import { withContextProps } from 'react-props-from-context';
 import { form } from './form';
-import { useTraceFilterOptionsContext } from '/src/traces/components/TraceFilterOptionsProvider';
-import { TraceFilterT } from '/src/api/types/TraceFilterT';
+import { traceFilterCtx } from '/src/traces/hooks/useTraceFilterContext';
 import {
   DateTimeField,
   Field,
@@ -31,9 +30,7 @@ const traceStateOptions = [
 ];
 
 const ContextProps = {
-  setTraceFilterOptions: useTraceFilterOptionsContext as any as (
-    options: TraceFilterT
-  ) => void,
+  setTraceFilterOptions: traceFilterCtx.setTraceFilterOptions,
 };
 
 export type PropsT = {

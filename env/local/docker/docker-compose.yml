@@ -21,7 +21,7 @@ services:
     build:
       context: ${ROOT_DIR}
       dockerfile: services/woodstock_ui/Dockerfile.local
-    command: yarn dev --host
+    command: sleep infinity
     env_file:
       - env_files/woodstock-ui.env
     ports:

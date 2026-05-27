@@ -4,7 +4,7 @@ import * as R from 'ramda';
 import { queryClient } from '/src/api/queryClient';
 import { L } from '/src/frames/layout';
 import { cn } from '/src/utils/classnames';
-import { TraceFilterOptionsProvider } from '/src/traces/components/TraceFilterOptionsProvider';
+import { TraceFilterStateProvider } from '/src/traces/components/TraceFilterStateProvider';
 import { TracesStateProvider } from '/src/traces/components/TracesStateProvider';
 import { TracesSwitch } from '/src/traces/components/TracesSwitch';
 import { ScreenPropertiesEffect } from '/src/app/components/ScreenPropertiesEffect';
@@ -15,7 +15,7 @@ export const App = () => {
   return (
     <QueryClientProvider client={queryClient}>
       <AppStateProvider>
-        <TraceFilterOptionsProvider>
+        <TraceFilterStateProvider>
           <TracesStateProvider>
             <TraceTreeStateProvider>
               <AppBody>
@@ -24,7 +24,7 @@ export const App = () => {
               </AppBody>
             </TraceTreeStateProvider>
           </TracesStateProvider>
-        </TraceFilterOptionsProvider>
+        </TraceFilterStateProvider>
       </AppStateProvider>
     </QueryClientProvider>
   );

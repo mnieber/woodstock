@@ -28,7 +28,7 @@ export const TraceListView = observer(
       const url = tracesNav.trace({ traceKey: trace.traceKey }).url;
       return (
         <TraceListItem
-          key={trace.traceKey}
+          key={`${trace.traceKey}-${trace.timestamp}`}
           className={{
             'bg-gray-100': props.tracesSelection.itemIds.includes(
               trace.traceKey
