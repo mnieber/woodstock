@@ -1,6 +1,6 @@
 import React from 'react';
 import { observer } from 'mobx-react-lite';
-import { FormState, FormStateProvider } from 'react-form-state-context';
+import { FormState, FormStateProvider, useFormStateContext } from 'react-form-state-context';
 import { withContextProps } from 'react-props-from-context';
 import { form } from './form';
 import { traceFilterCtx } from '/src/traces/hooks/useTraceFilterContext';
@@ -9,7 +9,6 @@ import {
   Field,
   FormClearButton,
   FormFieldLabel,
-  FormSaveButton,
   SelectField,
   TextField,
 } from '/src/forms/components';
@@ -31,10 +30,39 @@ const traceStateOptions = [
 
 const ContextProps = {
   setTraceFilterOptions: traceFilterCtx.setTraceFilterOptions,
+  isTraceFilterEnabled: traceFilterCtx.isTraceFilterEnabled,
+  setIsTraceFilterEnabled: traceFilterCtx.setIsTraceFilterEnabled,
 };
 
 export type PropsT = {
   className?: any;
+};
+
+type EnableButtonPropsT = {
+  isEnabled: boolean;
+  onToggle: () => void;
+};
+
+const EnableButton = (props: EnableButtonPropsT) => {
+  const formState = useFormStateContext();
+
+  return (
+    <button
+      type="button"
+      onClick={props.onToggle}
+      disabled={formState.getFlag('submitting')}
+      className={cn(
+        'EnableButton',
+        'flex-1 px-4 py-2 text-sm rounded transition-colors',
+        'disabled:opacity-50 disabled:cursor-not-allowed',
+        props.isEnabled
+          ? 'bg-blue-500 text-white hover:bg-blue-600'
+          : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+      )}
+    >
+      {props.isEnabled ? 'Enabled' : 'Enable'}
+    </button>
+  );
 };
 
 export const TraceFilterFormView = observer(
@@ -51,6 +79,14 @@ export const TraceFilterFormView = observer(
       fs.setValue(formFields.timeRangeStart, '');
       fs.setValue(formFields.timeRangeEnd, '');
       fs.submit();
+    };
+
+    const handleToggleEnable = () => {
+      const nextEnabled = !props.isTraceFilterEnabled;
+      props.setIsTraceFilterEnabled(nextEnabled);
+      if (nextEnabled) {
+        formStateRef.current?.submit();
+      }
     };
 
     return (
@@ -95,7 +131,10 @@ export const TraceFilterFormView = observer(
           </Field>
 
           <div className="flex gap-2 pt-2">
-            <FormSaveButton label="Apply" className="flex-1" />
+            <EnableButton
+              isEnabled={props.isTraceFilterEnabled}
+              onToggle={handleToggleEnable}
+            />
             <FormClearButton
               label="Clear"
               onClick={handleClear}

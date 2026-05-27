@@ -4,6 +4,7 @@ import { updateSources } from 'mobx-resource-states';
 import { withContextProps } from 'react-props-from-context';
 import React from 'react';
 import { isQueryLoading } from '/src/api/lib/ObservableQuery';
+import { TraceFilterT } from '/src/api/types/TraceFilterT';
 import { traceFilterCtx } from '/src/traces/hooks/useTraceFilterContext';
 import { TracesContext } from '/src/traces/hooks/useTracesContext';
 import { useTracesState } from '/src/traces/hooks/useTracesState';
@@ -14,13 +15,16 @@ export type PropsT = React.PropsWithChildren<{}>;
 
 const ContextProps = {
   traceFilterOptions: traceFilterCtx.traceFilterOptions,
+  isTraceFilterEnabled: traceFilterCtx.isTraceFilterEnabled,
 };
 
 export const TracesStateProvider = observer(
   withContextProps((props: PropsT & typeof ContextProps) => {
-    const { tracesState, queryTraces } = useTracesState({
-      filter: props.traceFilterOptions,
-    });
+    const filter: TraceFilterT = props.isTraceFilterEnabled
+      ? props.traceFilterOptions
+      : {};
+
+    const { tracesState, queryTraces } = useTracesState({ filter });
 
     const cache = useBuilder(() =>
       makeAutoObservable({
