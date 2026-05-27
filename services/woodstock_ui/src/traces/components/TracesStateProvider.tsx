@@ -3,6 +3,7 @@ import { observer } from 'mobx-react-lite';
 import { updateSources } from 'mobx-resource-states';
 import { withContextProps } from 'react-props-from-context';
 import React from 'react';
+import { isRunning } from '/src/api/lib/ObservableMutation';
 import { isQueryLoading } from '/src/api/lib/ObservableQuery';
 import { TraceFilterT } from '/src/api/types/TraceFilterT';
 import { traceFilterCtx } from '/src/traces/hooks/useTraceFilterContext';
@@ -24,14 +25,15 @@ export const TracesStateProvider = observer(
       ? props.traceFilterOptions
       : {};
 
-    const { tracesState, queryTraces } = useTracesState({ filter });
+    const { tracesState, queryTraces, deleteOldTracesMutation } = useTracesState({ filter });
 
     const cache = useBuilder(() =>
       makeAutoObservable({
         get traces() {
           return updateSources(
             { resource: tracesState.tracesCtr.data.traces },
-            ['loading', () => isQueryLoading(queryTraces), 'queryTraces']
+            ['loading', () => isQueryLoading(queryTraces), 'queryTraces'],
+            ['updating', () => isRunning(deleteOldTracesMutation), 'deleteOldTraces']
           );
         },
         get trace() {
@@ -54,6 +56,7 @@ export const TracesStateProvider = observer(
         tracesHighlight: () => tracesState.tracesCtr.highlight,
         tracesSelection: () => tracesState.tracesCtr.selection,
         viewMode: () => tracesState.tracesCtr.viewMode,
+        tracesDeletion: () => tracesState.tracesCtr.deletion,
         queryTraces: () => queryTraces,
       });
     };

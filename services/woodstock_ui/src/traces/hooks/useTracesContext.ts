@@ -2,6 +2,7 @@ import * as R from 'ramda';
 import React from 'react';
 import { Highlight, Selection } from 'skandha-facets';
 import { TraceRecordT } from '/src/api/types/TraceRecordT';
+import { Deletion } from '/src/traces/TracesState/facets/Deletion';
 import { TracesState } from '/src/traces/TracesState';
 
 export const TracesContext = React.createContext<any>(null);
@@ -24,6 +25,7 @@ export const tracesCtx = R.mergeAll([
     tracesHighlight: [useTracesContext, 'tracesHighlight'] as any as Highlight,
     tracesSelection: [useTracesContext, 'tracesSelection'] as any as Selection,
     viewMode: [useTracesContext, 'viewMode'] as any as any,
+    tracesDeletion: [useTracesContext, 'tracesDeletion'] as any as Deletion,
     queryTraces: [useTracesContext, 'queryTraces'] as any as any,
   },
 ]);

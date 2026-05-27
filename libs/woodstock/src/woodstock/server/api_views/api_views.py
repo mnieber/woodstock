@@ -3,6 +3,7 @@ import re
 
 import bottle
 
+from woodstock.server.actions.delete_old_traces import DeleteOldTracesForm, delete_old_traces
 from woodstock.server.actions.fetch_blob import FetchBlobForm, fetch_blob
 from woodstock.server.actions.query_traces import QueryTracesForm, query_traces
 from woodstock.server.models.index_state import IndexState
@@ -17,11 +18,19 @@ def _add_cors_headers():
     origin = bottle.request.environ.get('HTTP_ORIGIN', '')
     if _LOCALHOST_ORIGIN.match(origin):
         bottle.response.set_header('Access-Control-Allow-Origin', origin)
+        bottle.response.set_header('Access-Control-Allow-Methods', 'GET, POST, OPTIONS')
+        bottle.response.set_header('Access-Control-Allow-Headers', 'Content-Type')
 
 
 @app.hook('after_request')
 def apply_cors():
     _add_cors_headers()
+
+
+@app.route('/<:path>', method='OPTIONS')
+def handle_options(*args, **kwargs):
+    _add_cors_headers()
+    return {}
 
 
 @app.route("/query-traces")
@@ -49,6 +58,20 @@ def handle_query_traces():
             for item in trace_list.items
         ]
     })
+
+
+@app.route("/delete-old-traces", method="POST")
+def handle_delete_old_traces():
+    file_storage = bottle.request.app.config["file_storage"]
+    index_state = bottle.request.app.config["index_state"]
+    body = bottle.request.json or {}
+    older_than_timestamp = body.get("older_than_timestamp")
+    if not older_than_timestamp:
+        bottle.abort(400, "older_than_timestamp is required")
+    form = DeleteOldTracesForm(older_than_timestamp=older_than_timestamp)
+    delete_old_traces(form, file_storage, index_state)
+    bottle.response.content_type = "application/json"
+    return json.dumps({"ok": True})
 
 
 @app.route("/fetch-blob")

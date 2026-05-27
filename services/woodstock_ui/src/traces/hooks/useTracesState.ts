@@ -1,5 +1,6 @@
 import React from 'react';
 import { useObservableQuery } from '/src/api/hooks';
+import { useDeleteOldTraces } from '/src/api/mutations/useDeleteOldTraces';
 import { useQueryTraces } from '/src/api/queries/useQueryTraces';
 import { TraceFilterT } from '/src/api/types/TraceFilterT';
 import { TracesState } from '/src/traces/TracesState';
@@ -12,6 +13,7 @@ export type PropsT = {
 
 export const useTracesState = (props: PropsT) => {
   const graftResourceStatesFromMemo = useGraftResourceStatesFromMemo({});
+  const deleteOldTracesMutation = useDeleteOldTraces();
 
   // Queries
   const queryTraces = useObservableQuery(useQueryTraces(props.filter ?? {}), {
@@ -29,6 +31,9 @@ export const useTracesState = (props: PropsT) => {
           b.timestamp.localeCompare(a.timestamp)
         );
       },
+      deleteOldTraces: (olderThanTimestamp: string) => {
+        deleteOldTracesMutation.mutateAsync({ olderThanTimestamp });
+      },
     });
 
     return state;
@@ -39,5 +44,6 @@ export const useTracesState = (props: PropsT) => {
   return {
     tracesState,
     queryTraces,
+    deleteOldTracesMutation,
   };
 };

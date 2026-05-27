@@ -7,7 +7,7 @@ from woodstock.storage.models.file_storage import FileStorage
 
 @dataclass
 class DeleteOldTracesForm:
-    retention_days: int
+    older_than_timestamp: str  # ISO-8601 datetime string
 
 
 def delete_old_traces(
@@ -16,8 +16,8 @@ def delete_old_traces(
     index_state: IndexState,
 ) -> None:
     rows = index_state.conn.execute(
-        "SELECT uuidv7, trace_key FROM traces WHERE timestamp < datetime('now', ? || ' days')",
-        (f"-{form.retention_days}",),
+        "SELECT uuidv7, trace_key FROM traces WHERE timestamp < ?",
+        (form.older_than_timestamp,),
     ).fetchall()
 
     if not rows:

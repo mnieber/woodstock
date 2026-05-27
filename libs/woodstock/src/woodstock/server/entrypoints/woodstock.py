@@ -44,7 +44,7 @@ def _run_indexer(args: argparse.Namespace) -> None:
 
 def _run_server(args: argparse.Namespace) -> None:
     file_storage = get_file_storage()
-    init_state = IndexState(conn=_open_db())
+    index_state = IndexState(conn=_open_db())
     upsert_trace(
         UpsertTraceForm(
             trace_record=TraceRecord(
@@ -55,10 +55,8 @@ def _run_server(args: argparse.Namespace) -> None:
             ),
             uuidv7=uuid7(),
         ),
-        init_state,
+        index_state,
     )
-    init_state.conn.close()
-    index_state = IndexState(conn=_open_db(read_only=True))
     app.config["file_storage"] = file_storage
     app.config["index_state"] = index_state
     bottle.run(app, host=args.host, port=args.port)
@@ -68,11 +66,11 @@ def _delete_old_traces(args: argparse.Namespace) -> None:
     file_storage = get_file_storage()
     index_state = IndexState(conn=_open_db())
     delete_old_traces(
-        DeleteOldTracesForm(retention_days=args.retention_days),
+        DeleteOldTracesForm(older_than_timestamp=args.older_than_timestamp),
         file_storage,
         index_state,
     )
-    logger.info("Deleted traces older than %d days", args.retention_days)
+    logger.info("Deleted traces older than %s", args.older_than_timestamp)
 
 
 def _parse_args() -> argparse.Namespace:
@@ -93,13 +91,12 @@ def _parse_args() -> argparse.Namespace:
     p_server.add_argument("--port", type=int, default=8080)
 
     p_delete = sub.add_parser(
-        "delete-old-traces", help="Delete traces older than a given number of days"
+        "delete-old-traces", help="Delete traces older than a given ISO-8601 timestamp"
     )
     p_delete.add_argument(
-        "--retention-days",
-        type=int,
+        "--older-than-timestamp",
         required=True,
-        help="Delete traces older than this many days",
+        help="Delete traces with a timestamp older than this ISO-8601 datetime",
     )
 
     return parser.parse_args()
