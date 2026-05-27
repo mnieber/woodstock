@@ -18,15 +18,17 @@ const getInitialValues = (props: FormPropsT) => {
   };
 };
 
-const getHandleValidate = () => ({
-  values,
-  setError,
-}: {
-  values: FormState['values'];
-  setError: FormState['setError'];
-}) => {
-  // No validation required for filter form - all fields are optional
-};
+const getHandleValidate =
+  () =>
+  ({
+    values,
+    setError,
+  }: {
+    values: FormState['values'];
+    setError: FormState['setError'];
+  }) => {
+    // No validation required for filter form - all fields are optional
+  };
 
 const getHandleSubmit =
   (props: FormPropsT) =>

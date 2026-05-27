@@ -60,8 +60,8 @@ export const ValuePicker = observer(
       value: isNil(pickableValue)
         ? null
         : isMulti
-        ? (pickableValue as any).map(toPickedValue)
-        : toPickedValue(pickableValue),
+          ? (pickableValue as any).map(toPickedValue)
+          : toPickedValue(pickableValue),
       placeholder: placeholder ?? 'Select...',
       onKeyDown: (e: any) => {
         if (others.onKeyDown) {

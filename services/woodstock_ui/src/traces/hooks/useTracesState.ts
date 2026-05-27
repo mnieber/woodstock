@@ -14,13 +14,10 @@ export const useTracesState = (props: PropsT) => {
   const graftResourceStatesFromMemo = useGraftResourceStatesFromMemo({});
 
   // Queries
-  const queryTraces = useObservableQuery(
-    useQueryTraces(props.filter ?? {}),
-    {
-      fetchAsLoad: true,
-      debugLabel: 'queryTraces',
-    }
-  );
+  const queryTraces = useObservableQuery(useQueryTraces(props.filter ?? {}), {
+    fetchAsLoad: true,
+    debugLabel: 'queryTraces',
+  });
 
   const tracesState = useBuilder(() => {
     const state = new TracesState({
@@ -28,8 +25,8 @@ export const useTracesState = (props: PropsT) => {
         const items = graftResourceStatesFromMemo({
           resources: queryTraces.data?.items ?? [],
         });
-        return [...items].sort(
-          (a, b) => b.timestamp.localeCompare(a.timestamp)
+        return [...items].sort((a, b) =>
+          b.timestamp.localeCompare(a.timestamp)
         );
       },
     });

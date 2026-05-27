@@ -18,7 +18,9 @@ export const PayloadTreeField: React.FC<PropsT> = (props: PropsT) => {
       </div>
 
       {blobQuery.isLoading && (
-        <div className="text-sm text-gray-500 italic">Loading blob content...</div>
+        <div className="text-sm text-gray-500 italic">
+          Loading blob content...
+        </div>
       )}
 
       {blobQuery.isError && (

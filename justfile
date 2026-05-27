@@ -41,6 +41,10 @@ shell-indexer:
 shell-server:
     @just _run_image "woodstock-server" "false" "true"
 
+# Format all TypeScript code in woodstock-ui using prettier
+format-code:
+    cd services/woodstock_ui && npx prettier --write "src/**/*.{ts,tsx}"
+
 # Run woodstock-indexer, woodstock-server and woodstock-ui against a local FS directory.
 # Usage: just woodstock-ui /opt/projects/calcium/woodstock/data
 run-woodstock data_dir: compile-env-files

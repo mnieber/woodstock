@@ -71,7 +71,9 @@ export const PayloadFieldsView: React.FC<PropsT> = (props: PropsT) => {
       {/* Documents Section */}
       {treeFields.length > 0 && (
         <section>
-          <h2 className="text-lg font-semibold text-gray-900 mb-3">Documents</h2>
+          <h2 className="text-lg font-semibold text-gray-900 mb-3">
+            Documents
+          </h2>
           <div className="space-y-4">
             {treeFields.map(([key, treePath]) => (
               <PayloadTreeField key={key} fieldKey={key} treePath={treePath} />

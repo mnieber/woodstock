@@ -14,15 +14,18 @@ export const TracesStateProvider = observer((props: PropsT) => {
   // Create a memoized filter object that updates when filter facet changes
   const [filterForQuery, setFilterForQuery] = React.useState({});
 
-  const { tracesState, queryTraces } = useTracesState({ filter: filterForQuery });
+  const { tracesState, queryTraces } = useTracesState({
+    filter: filterForQuery,
+  });
 
   const cache = useBuilder(() =>
     makeAutoObservable({
       get traces() {
-        return updateSources(
-          { resource: tracesState.tracesCtr.data.traces },
-          ['loading', () => isQueryLoading(queryTraces), 'queryTraces']
-        );
+        return updateSources({ resource: tracesState.tracesCtr.data.traces }, [
+          'loading',
+          () => isQueryLoading(queryTraces),
+          'queryTraces',
+        ]);
       },
       get trace() {
         return updateSources(
