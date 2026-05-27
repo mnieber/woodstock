@@ -1,17 +1,17 @@
 export COMPOSE_PROJECT_NAME := "woodstock_local"
 export ROOT_DIR := `git rev-parse --show-toplevel`
-export COMPOSE_DIR := justfile_directory() + "/docker"
+export COMPOSE_DIR := justfile_directory() + "/env/local/docker"
 
-import 'just/_build_images.just'
-import 'just/_up.just'
-import 'just/_down.just'
-import 'just/_run_image.just'
+import 'env/local/just/_build_images.just'
+import 'env/local/just/_up.just'
+import 'env/local/just/_down.just'
+import 'env/local/just/_run_image.just'
 
 # Compile .env.in templates into .env files
 compile-env-files:
-    python scripts/compile_env_files.py \
-        --input secrets.env \
-        docker/env_files
+    python env/local/scripts/compile_env_files.py \
+        --input env/local/secrets.env \
+        env/local/docker/env_files
 
 # Build all images
 build *args:
