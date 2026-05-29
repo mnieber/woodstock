@@ -19,27 +19,6 @@ def upsert_trace(form: UpsertTraceForm, index_state: IndexState) -> None:
     conn = index_state.conn
     conn.execute(
         """
-        CREATE TABLE IF NOT EXISTS traces (
-            uuidv7       TEXT PRIMARY KEY,
-            trace_key    TEXT,
-            trace_state  TEXT,
-            author       TEXT,
-            timestamp    TEXT,
-            payload      TEXT,
-            labels       TEXT
-        )
-        """
-    )
-    conn.execute(
-        """
-        CREATE TABLE IF NOT EXISTS index_meta (
-            key    TEXT PRIMARY KEY,
-            value  TEXT
-        )
-        """
-    )
-    conn.execute(
-        """
         INSERT INTO traces (uuidv7, trace_key, trace_state, author, timestamp, payload, labels)
         VALUES (?, ?, ?, ?, ?, ?, ?)
         ON CONFLICT (uuidv7) DO UPDATE SET
@@ -67,5 +46,4 @@ def upsert_trace(form: UpsertTraceForm, index_state: IndexState) -> None:
         """,
         (f"traces/{form.uuidv7}.json",),
     )
-    conn.commit()
     logger.info("Upserted trace %s into index", form.uuidv7)

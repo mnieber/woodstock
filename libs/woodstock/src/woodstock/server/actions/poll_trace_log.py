@@ -44,3 +44,6 @@ def poll_trace_log(form: PollTraceLogForm, file_storage: FileStorage, index_stat
         )
         uuidv7 = path.removeprefix("traces/").removesuffix(".json")
         upsert_trace(UpsertTraceForm(trace_record=record, uuidv7=uuidv7), index_state)
+
+    if new_entries:
+        index_state.conn.commit()

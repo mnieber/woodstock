@@ -24,10 +24,33 @@ logger = logging.getLogger(__name__)
 
 
 def _open_db(read_only: bool = False) -> sqlite3.Connection:
-    conn = sqlite3.connect(WOODSTOCK_DB_PATH, check_same_thread=False)
+    conn = sqlite3.connect(WOODSTOCK_DB_PATH, check_same_thread=False, timeout=10)
     conn.execute("PRAGMA journal_mode=WAL")
     if read_only:
         conn.execute("PRAGMA query_only=ON")
+    else:
+        conn.execute(
+            """
+            CREATE TABLE IF NOT EXISTS traces (
+                uuidv7       TEXT PRIMARY KEY,
+                trace_key    TEXT,
+                trace_state  TEXT,
+                author       TEXT,
+                timestamp    TEXT,
+                payload      TEXT,
+                labels       TEXT
+            )
+            """
+        )
+        conn.execute(
+            """
+            CREATE TABLE IF NOT EXISTS index_meta (
+                key    TEXT PRIMARY KEY,
+                value  TEXT
+            )
+            """
+        )
+        conn.commit()
     return conn
 
 

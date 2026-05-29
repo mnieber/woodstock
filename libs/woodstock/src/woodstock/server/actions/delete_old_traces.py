@@ -31,3 +31,4 @@ def delete_old_traces(
     index_state.conn.execute(
         f"DELETE FROM traces WHERE uuidv7 IN ({placeholders})", uuidv7s
     )
+    index_state.conn.commit()
